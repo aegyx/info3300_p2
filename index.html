@@ -5,6 +5,19 @@
   <script src="https://d3js.org/topojson.v3.min.js"></script>
   <style>
 
+  body {
+    color: grey;
+    font-family: sans-serif;
+  }
+
+  h3 {
+    font-size: 15px;
+    font-weight: lighter;
+    margin-top: 1%;
+    margin-right: 1%;
+    text-align: right;
+  }
+
   .county {
     fill: lightgrey;
   }
@@ -14,13 +27,62 @@
     stroke-width: 0.5px;
     fill: none;
   }
-
+/*
   #currentRating {
     font-weight: bold;
-  }
+  }*/
 
   .slider {
-    width: 400px;
+    width: 450px;
+  }
+
+  .page-wrapper {
+    display: flex;
+  }
+
+  .left-column {
+    flex: 35%;
+  }
+
+  .right-column {
+    flex: 65%;
+  }
+
+  #filtergroup {
+    margin-top: 50px;
+    margin-left: 90px;
+  }
+
+  .slider_title {
+    font-size: 20px;
+    font-weight: lighter;
+    display: block;
+    margin-bottom: 3%;
+    margin-top: 10%;
+  }
+
+  #cuisine_filter {
+    margin-top: 10%;
+    font-weight: lighter;
+    font-size: 20px;
+  }
+
+  .checkbox {
+    margin-bottom: 6%;
+    margin-left: 1.5%;
+  }
+
+  h2 {
+    font-weight: lighter;
+    font-size: 60px;
+    margin-left: 80px;
+    margin-top: 150px;
+  }
+
+  .kyoto {
+    color: red;
+    font-size: 85px;
+    margin-bottom: 0px;
   }
 
   </style>
@@ -28,26 +90,38 @@
 
 <body>
   <!-- name and netid -->
-  <h3>Name: Kevin Lee, NetId: ksl66</h3>
-  <h3>Name: Yulu Cao, NetId: yc758</h3>
+<!--   <h3>Name: Kevin Lee, NetId: ksl66</h3>
+  <h3>Name: Yulu Cao, NetId: yc758</h3> -->
+
+<h3>Kevin Lee [ksl66] | Yulu Cao [yc758]</h3>
+
+<div class="page-wrapper">
+
+  <div class="left-column">
 
 
-  <svg id="graph" height="1000" width="1000" style="margin:20px">
-  </svg>
-  <div id="filtergroup">
-    <div class="filter">
-      <label for="rating">Rating</label>
-      <input id="rateSlider" class="slider" type="range" value="3" min="3" max="4.2" step="0.1">
-      <span id="currentRating"> </span>
-    </div>
+  <h2><span class="kyoto"> Kyoto:</span> <br>Where are You Setting Up ?</h2>
 
-    <div class="filter">
-      <label for="price">Price</label>
-      <input id="priceSlider" class="slider" type="range" value="1" min="1" max="12" step="1">
-      <span id="currentPrice"> </span>
+    <div id="filtergroup">
+      <div class="filter">
+        <label for="rating" class="slider_title">Filter on Rating</label>
+        <input id="rateSlider" class="slider" type="range" value="3" min="3" max="4.2" step="0.1">
+        <span id="currentRating"> </span>
+      </div>
+
+      <div class="filter">
+        <label for="price" class="slider_title">Filter on Price</label>
+        <input id="priceSlider" class="slider" type="range" value="1" min="1" max="12" step="1">
+        <span id="currentPrice"> </span>
+      </div>
     </div>
 
   </div>
+
+
+  <div class="right-column">
+
+  <svg id="graph" height="1000" width="1200" style="margin:20px"></svg>
 
   <script>
 
@@ -55,7 +129,7 @@
   const svg = d3.select("#graph");
   const width = svg.attr("width");
   const height = svg.attr("height");
-  const margin = { top: 20, right: 200, bottom: 20, left:20};
+  const margin = { top: 20, right: 300, bottom: 20, left:20};
   const mapWidth = width - margin.left - margin.right;
   const mapHeight = height - margin.top - margin.bottom;
   const map = svg.append("g")
@@ -193,6 +267,11 @@
       .range(price_ranges);
 
 
+    displayPriceScale = d3.scaleOrdinal()
+      .domain([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+      .range(["~999 JPY", "1000~1999 JPY", "2000~2999 JPY", "3000~3999 JPY", "4000~4999 JPY", "5000~5999 JPY", "6000~7999 JPY", "8000~9999 JPY", "10000~14999 JPY", "15000~19999 JPY", "20000~29999 JPY", "30000+ JPY"]);
+
+
     // Draw circles using the positions we just made
     function showCircles(rating, price, cuisine) {
 
@@ -256,7 +335,7 @@
       current_price = d3.select("#priceSlider").attr("value");
       showCircles(current_rating, this.value, current_cuisine);
       d3.select("#currentPrice")
-        .text(reversePriceScale(this.value));
+        .text(displayPriceScale(this.value));
     });
 
     d3.selectAll(".checkbox").on("change", function() {
@@ -266,8 +345,9 @@
         if(current_box.property("checked")){
           current_cuisine.push(current_box.property("value"));
         };
-      showCircles(current_rating, current_price, current_cuisine);
+      // showCircles(current_rating, current_price, current_cuisine);
       });
+      showCircles(current_rating, current_price, current_cuisine);
     });
 
 
@@ -277,5 +357,8 @@
 
   </script>
 
+</div>
+
+</div>
 </body>
 </html>
