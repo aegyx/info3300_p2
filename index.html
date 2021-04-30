@@ -245,7 +245,7 @@
 
     // making the rating slider work
     d3.select("#rateSlider").on("input", function() {
-      current_rating = d3.select("#slider").attr("value");
+      current_rating = d3.select("#rateSlider").attr("value");
       showCircles(this.value, current_price, current_cuisine);
       d3.select("#currentRating")
         .text(this.value);
