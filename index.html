@@ -15,7 +15,6 @@
     fill: none;
   }
 
-
   </style>
 </head>
 
@@ -40,7 +39,7 @@
                  .attr("transform","translate("+margin.left+","+margin.top+")");
   // TODO: need to change the transform function of the res_description
   const res_description = svg.append("g")
-                             .attr("transform", "translate(800, 20)");
+                             .attr("transform", "translate(800, 400)");
   const res_name = res_description.append("text")
                                   .attr("id", "res_name")
                                   .attr("x", 0)
@@ -53,7 +52,10 @@
                                   .attr("id", "res_price")
                                   .attr("x", 0)
                                   .attr("y", 40);
-
+  const res_rating = res_description.append("text")
+                                  .attr("id", "res_rating")
+                                  .attr("x", 0)
+                                  .attr("y", 60);
   const requestData = async () => {
 
     const kyoto = await d3.json("../kyoto_all.json");
@@ -113,22 +115,28 @@
          .on("mouseover", function() {
            d3.select(this)
              .transition().duration(100)
-             .attr("r", 2);
+             .attr("r", 5);
 
            let name = d3.select(this).datum()["name"];
            let jp_name = d3.select(this).datum()["japan_name"];
            let price = d3.select(this).datum()["price"];
+           let rating = d3.select(this).datum()["rating"];
            d3.select("#res_name")
-             .text(name);
+             .text("NAME:" + name);
            d3.select("#res_jp_name")
-             .text(jp_name);
+             .text("JAPANESE NAME:" + jp_name);
            d3.select("#res_price")
-             .text(price);
+             .text("AVG PRICE:" + price);
+           d3.select("#res_rating")
+             .text("RATING:" + rating);
          })
          .on("mouseout", function() {
            d3.select(this)
              .transition().duration(100)
              .attr("r", 1);
+
+           d3.selectAll("text")
+             .text("");
          });
   };
 
@@ -168,7 +176,7 @@
   </script>
 
 
-  Filter by Rating: 
+  Filter by Rating:
   <div id="ratingFilter" class="filter"> </div>
   <span id="clear">CLEAR</span>
 
