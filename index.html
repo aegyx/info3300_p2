@@ -34,6 +34,20 @@
 
   <svg id="graph" height="1000" width="1000" style="margin:20px">
   </svg>
+  <div id="filtergroup">
+    <div class="filter">
+      <label for="rating">Rating</label>
+      <input id="rateSlider" class="slider" type="range" value="3" min="3" max="4.2" step="0.1">
+      <span id="currentRating"> </span>
+    </div>
+
+    <div class="filter">
+      <label for="price">Price</label>
+      <input id="priceSlider" class="slider" type="range" value="1" min="1" max="12" step="1">
+      <span id="currentPrice"> </span>
+    </div>
+
+  </div>
 
   <script>
 
@@ -47,6 +61,7 @@
   const map = svg.append("g")
                  .attr("transform","translate("+margin.left+","+margin.top+")");
   // TODO: need to change the transform function of the res_description
+  // restaurant description label
   const res_description = svg.append("g")
                              .attr("id", "res_description")
                              .attr("transform", "translate(800, 400)");
@@ -66,7 +81,7 @@
                                   .attr("id", "res_rating")
                                   .attr("x", 0)
                                   .attr("y", 60);
-
+  // region description label
   const region_description = svg.append("g")
                                 .attr("id", "region_description")
                                 .attr("transform", "translate(800, 400)");
@@ -74,7 +89,10 @@
                                   .attr("id", "region_name")
                                   .attr("x", 0)
                                   .attr("y", 0);
-
+  // cuisine filter
+  const cuisine_filter = d3.select("#filtergroup").append("div")
+                           .attr("id", "cuisine_filter")
+                           .attr("class", "filter");
 
   const requestData = async () => {
 
@@ -87,7 +105,6 @@
         kyoto.objects.kyoto.geometries.splice(i, 1);
       };
     };
-    console.log(kyoto.objects.kyoto.geometries);
 
     // draw the map
     var city = topojson.feature(kyoto, kyoto.objects.kyoto);
@@ -139,11 +156,26 @@
     let uniquePrice = [...new Set(price)];
     console.log(uniquePrice);
 
-    // create the color scale
-    colorScale = d3.scaleOrdinal()
+    // create a cuisine scale
+    cuisineScale = d3.scaleOrdinal()
                   .domain(uniqueCuisine)
                   .range(d3.schemeTableau10);
 
+    // cuisine filter
+    uniqueCuisine.forEach( function(d, i) {
+      // append checkbox
+      d3.select("#cuisine_filter")
+        .append("input")
+        .attr("class", "checkbox")
+        .attr("type", "checkbox")
+        .attr("value", d)
+        .attr("checked", true);
+      // append label
+      d3.select("#cuisine_filter")
+        .append("label")
+        .text(d)
+        .style("color",cuisineScale(d));
+    });
 
     const ratingextent = d3.extent(restaurants, d => d['rating']);
     console.log(ratingextent); // the lowest rating is 3.0, and the highest is 4.2. Adjust slider to accomodate
@@ -162,18 +194,20 @@
 
 
     // Draw circles using the positions we just made
-    function showCircles(rating, price) {
+    function showCircles(rating, price, cuisine) {
 
+      // filter restaurants based on the input rating and price
       var data = restaurants;
       data = data.filter( (d) => {
-        return d.rating >= rating && priceScale(d.price) >= price; // we show restaurants that have the specified price or below ? might be good to have an option for users to tick if they want to see restaurants below or above the indicated price
+        return d.rating >= rating && priceScale(d.price) >= price &&  cuisine.includes(d.cuisine);
+        // we show restaurants that have the specified price or below ? might be good to have an option for users to tick if they want to see restaurants below or above the indicated price
       });
 
       map.selectAll("circle.dot").data(data)
         .join("circle")
         .attr('class','dot')
         .attr("r", 1)
-        .attr("fill", d => colorScale(d.cuisine))
+        .attr("fill", d => cuisineScale(d.cuisine))
         .attr("cx", d => d.position[0])
         .attr("cy", d => d.position[1])
         .attr("opacity", 1)
@@ -205,23 +239,35 @@
            });
     }
 
-    var current_rating = d3.select("#slider").attr("value");
+    var current_rating = d3.select("#rateSlider").attr("value");
     var current_price = d3.select("#priceSlider").attr("value");
-    showCircles(current_rating, current_price);
+    var current_cuisine = uniqueCuisine;
+    showCircles(current_rating, current_price, current_cuisine);
 
     // making the rating slider work
-    d3.select("#slider").on("input", function() {
+    d3.select("#rateSlider").on("input", function() {
       current_rating = d3.select("#slider").attr("value");
-      showCircles(this.value, current_price);
+      showCircles(this.value, current_price, current_cuisine);
       d3.select("#currentRating")
         .text(this.value);
     });
 
     d3.select("#priceSlider").on("input", function() {
       current_price = d3.select("#priceSlider").attr("value");
-      showCircles(current_rating, this.value);
+      showCircles(current_rating, this.value, current_cuisine);
       d3.select("#currentPrice")
         .text(reversePriceScale(this.value));
+    });
+
+    d3.selectAll(".checkbox").on("change", function() {
+      current_cuisine = [];
+      d3.selectAll(".checkbox").each(function() {
+        current_box = d3.select(this);
+        if(current_box.property("checked")){
+          current_cuisine.push(current_box.property("value"));
+        };
+      showCircles(current_rating, current_price, current_cuisine);
+      });
     });
 
 
@@ -230,18 +276,6 @@
   requestData();
 
   </script>
-
-  <div class="filter">
-    <label for="rating">Rating</label>
-    <input id="slider" class="slider" type="range" value="3" min="3" max="4.2" step="0.1">
-    <span id="currentRating"> </span>
-  </div>
-
-  <div class="filter">
-    <label for="price">Price</label>
-    <input id="priceSlider" class="slider" type="range" value="1" min="1" max="12" step="1">
-    <span id="currentPrice"> </span>
-  </div>
 
 </body>
 </html>
