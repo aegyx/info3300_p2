@@ -15,6 +15,14 @@
     fill: none;
   }
 
+  #currentRating {
+    font-weight: bold;
+  }
+
+  .slider {
+    width: 400px;
+  }
+
   </style>
 </head>
 
@@ -89,14 +97,18 @@
     console.log(restaurants);
 
     cuisine = [];
+    price = [];
     restaurants.forEach( (d, i) => {
     // Use the projection just like a scale to convert from lng/lat to pixels
       d.position = projection([d.Long, d.Lat]);
       cuisine.push(d.cuisine);
+      price.push(d.price);
     });
     console.log(restaurants);
     let uniqueCuisine = [...new Set(cuisine)];
     console.log(uniqueCuisine);
+    let uniquePrice = [...new Set(price)];
+    console.log(uniquePrice);
 
     // create the color scale
     colorScale = d3.scaleOrdinal()
@@ -104,15 +116,74 @@
                   .range(d3.schemeTableau10);
 
     // Draw circles using the positions we just made
-    map.selectAll("circle.dot").data(restaurants)
-         .join("circle")
-         .attr("class","dot")
-         .attr("r", 1)
-         .attr("fill", d => colorScale(d.cuisine))
-         .attr("opacity", 1)
-         .attr("cx", d => d.position[0])
-         .attr("cy", d => d.position[1])
-         .on("mouseover", function() {
+    // map.selectAll("circle.dot").data(restaurants)
+    //      .join("circle")
+    //      .attr("class","dot")
+    //      .attr("r", 1)
+    //      .attr("fill", d => colorScale(d.cuisine))
+    //      .attr("opacity", 1)
+    //      .attr("cx", d => d.position[0])
+    //      .attr("cy", d => d.position[1])
+    //      .on("mouseover", function() {
+    //        d3.select(this)
+    //          .transition().duration(100)
+    //          .attr("r", 5);
+
+    //        let name = d3.select(this).datum()["name"];
+    //        let jp_name = d3.select(this).datum()["japan_name"];
+    //        let price = d3.select(this).datum()["price"];
+    //        let rating = d3.select(this).datum()["rating"];
+    //        d3.select("#res_name")
+    //          .text("NAME:" + name);
+    //        d3.select("#res_jp_name")
+    //          .text("JAPANESE NAME:" + jp_name);
+    //        d3.select("#res_price")
+    //          .text("AVG PRICE:" + price);
+    //        d3.select("#res_rating")
+    //          .text("RATING:" + rating);
+    //      })
+    //      .on("mouseout", function() {
+    //        d3.select(this)
+    //          .transition().duration(100)
+    //          .attr("r", 1);
+
+    //        d3.selectAll("text")
+    //          .text("");
+    //      });
+
+  const ratingextent = d3.extent(restaurants, d => d['rating']);
+  console.log(ratingextent); // the lowest rating is 3.0, and the highest is 4.2. Adjust slider to accomodate
+
+  // create a price scale; change later in Python to numbers and not strings 
+  let price_ranges = [" ～￥999", "￥1000～￥1999", "￥2000～￥2999", "￥3000～￥3999", "￥4000～￥4999", "￥5000～￥5999", "￥6000～￥7999", "￥8000～￥9999", "￥10000～￥14999", "￥15000～￥19999", "￥20000～￥29999", "￥30000～"];
+
+  priceScale = d3.scaleOrdinal()
+    .domain(price_ranges)
+    .range([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+
+  // create a reverse price scale for calculating the input of the price slider
+  reversePriceScale = d3.scaleOrdinal()
+    .domain([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+    .range(price_ranges);
+
+
+  // Draw circles using the positions we just made
+  function showCircles(rating, price) {
+
+    var data = restaurants; 
+    data = data.filter( (d) => {
+      return d.rating >= rating && priceScale(d.price) >= price; // we show restaurants that have the specified price or below ? might be good to have an option for users to tick if they want to see restaurants below or above the indicated price 
+    });
+
+    map.selectAll("circle.dot").data(data)
+      .join("circle")
+      .attr('class','dot')
+      .attr("r", 1)
+      .attr("fill", d => colorScale(d.cuisine))
+      .attr("cx", d => d.position[0])
+      .attr("cy", d => d.position[1])
+      .attr("opacity", 1)
+      .on("mouseover", function() {
            d3.select(this)
              .transition().duration(100)
              .attr("r", 5);
@@ -138,94 +209,50 @@
            d3.selectAll("text")
              .text("");
          });
-  };
+  }
 
+  var current_rating = d3.select("#slider").attr("value");
+  var current_price = d3.select("#priceSlider").attr("value");
+  showCircles(current_rating, current_price);
 
-
-  function updateGraph(rating) {
-    // can later add more parameters for updating such as average price, or demographic factors that are available to be filtered on 
-    const data = restaurants
-
-    data = data.filter( (d) => {
-            return d.rating >= rating;
-    });
-    
-    map.selectAll('circle.dot').data(data)
-      .join( 
-        enter => { 
-          enter.append('circle')
-            .attr('class','dot')
-            .attr("r", 1)
-            .attr("fill", d => colorScale(d.cuisine))
-            .attr("cx", d => d.position[0])
-            .attr("cy", d => d.position[1])
-            .attr("opacity", 1);
-        },
-        update => update 
-          .attr("fill", d => colorScale(d.cuisine))
-          .attr("cx", d => d.position[0])
-          .attr("cy", d => d.position[1])
-          .attr("opacity", 1),
-        exit => { 
-          exit.remove()
-        });
-      };
-     
-    var ratings = [2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
-
-    ratings.forEach( d => {
-    // For each rating, add a new button to the button bar
-      d3.select("div#ratingFilter")
-        .append("button")
-        .text( d )
-        .on("click", function() {
-        // When it's clicked, call updateBars to update the chart
-          updateGraph(d);
-        })
-    });
-
-  // var ratings = [2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
-
-  // ratings.forEach( d => {
-
-  //   d3.select("div#ratingFilter")
-  //     .append("button")
-  //     .text(d.toString())
-  //     .on("click", function() {
-  //       d3.selectAll("#graph circle").each( function() {
-  //         let restaurant = d3.select(this);
-  //         if (restaurant.attr("rating") >= d) {
-  //           restaurant.attr("opacity", 1.0);
-  //         }
-  //         else {
-  //           restaurant.attr("opacity", 0);
-  //         }
-  //       });
-  //     });
-
-  // });
-
-  d3.select("#clear")
-    .append("button")
-    .text("clear")
-    .on("click", function() {
-      updateGraph(0);
-
-
-  updateGraph(0);
-
+  // making the rating slider work 
+  d3.select("#slider").on("input", function() {
+    current_rating = d3.select("#slider").attr("value");
+    showCircles(this.value, current_price);
+    d3.select("#currentRating") 
+      .text(this.value);
   });
+
+  d3.select("#priceSlider").on("input", function() {
+    current_price = d3.select("#priceSlider").attr("value");
+    showCircles(this.value, current_rating);
+    d3.select("#currentPrice") 
+      .text(reversePriceScale(this.value));
+  });
+  
+
+  }; // end of requestData async data load 
 
   requestData();
 
   </script>
 
+  <div class="filter">
+    <label for="rating">Rating</label>
+    <input id="slider" class="slider" type="range" value="3" min="3" max="4.2" step="0.1">
+    <span id="currentRating"> </span>
+  </div>
 
-  Filter by Rating:
-  <div id="ratingFilter" class="filter"> </div>
-  <span id="clear"> </span>
-
-
+  <div class="filter">
+    <label for="price">Price</label>
+    <input id="priceSlider" class="slider" type="range" value="1" min="1" max="12" step="1">
+    <span id="currentPrice"> </span>
+  </div>
 
 </body>
 </html>
+
+
+
+
+
