@@ -47,6 +47,7 @@
                  .attr("transform","translate("+margin.left+","+margin.top+")");
   // TODO: need to change the transform function of the res_description
   const res_description = svg.append("g")
+                             .attr("id", "res_description")
                              .attr("transform", "translate(800, 400)");
   const res_name = res_description.append("text")
                                   .attr("id", "res_name")
@@ -64,6 +65,16 @@
                                   .attr("id", "res_rating")
                                   .attr("x", 0)
                                   .attr("y", 60);
+
+  const region_description = svg.append("g")
+                                .attr("id", "region_description")
+                                .attr("transform", "translate(800, 400)");
+  const region_name = res_description.append("text")
+                                  .attr("id", "region_name")
+                                  .attr("x", 0)
+                                  .attr("y", 0);
+
+
   const requestData = async () => {
 
     const kyoto = await d3.json("../kyoto_all.json");
@@ -86,7 +97,24 @@
     map.selectAll("path.county").data(city.features)
        .join("path")
        .attr("class", "county")
-       .attr("d", path);
+       .attr("d", path)
+       .on("mouseover", function() {
+         d3.select(this)
+           .transition().duration(100)
+           .style("fill", "grey");
+
+         let name = d3.select(this).datum().properties.MOJI;
+         d3.select("#region_name")
+           .text(name);
+       })
+       .on("mouseout", function() {
+         d3.select(this)
+           .transition().duration(100)
+           .style("fill", "lightgrey");
+
+         d3.select("#region_name")
+           .text(name);
+       });
 
     map.append("path").datum(city)
        .attr("class","countyOutline")
@@ -154,7 +182,7 @@
   const ratingextent = d3.extent(restaurants, d => d['rating']);
   console.log(ratingextent); // the lowest rating is 3.0, and the highest is 4.2. Adjust slider to accomodate
 
-  // create a price scale; change later in Python to numbers and not strings 
+  // create a price scale; change later in Python to numbers and not strings
   let price_ranges = [" ～￥999", "￥1000～￥1999", "￥2000～￥2999", "￥3000～￥3999", "￥4000～￥4999", "￥5000～￥5999", "￥6000～￥7999", "￥8000～￥9999", "￥10000～￥14999", "￥15000～￥19999", "￥20000～￥29999", "￥30000～"];
 
   priceScale = d3.scaleOrdinal()
@@ -170,9 +198,9 @@
   // Draw circles using the positions we just made
   function showCircles(rating, price) {
 
-    var data = restaurants; 
+    var data = restaurants;
     data = data.filter( (d) => {
-      return d.rating >= rating && priceScale(d.price) >= price; // we show restaurants that have the specified price or below ? might be good to have an option for users to tick if they want to see restaurants below or above the indicated price 
+      return d.rating >= rating && priceScale(d.price) >= price; // we show restaurants that have the specified price or below ? might be good to have an option for users to tick if they want to see restaurants below or above the indicated price
     });
 
     map.selectAll("circle.dot").data(data)
@@ -206,7 +234,7 @@
              .transition().duration(100)
              .attr("r", 1);
 
-           d3.selectAll("text")
+           d3.select("#res_description").selectAll("text")
              .text("");
          });
   }
@@ -215,23 +243,23 @@
   var current_price = d3.select("#priceSlider").attr("value");
   showCircles(current_rating, current_price);
 
-  // making the rating slider work 
+  // making the rating slider work
   d3.select("#slider").on("input", function() {
     current_rating = d3.select("#slider").attr("value");
     showCircles(this.value, current_price);
-    d3.select("#currentRating") 
+    d3.select("#currentRating")
       .text(this.value);
   });
 
   d3.select("#priceSlider").on("input", function() {
     current_price = d3.select("#priceSlider").attr("value");
     showCircles(current_rating, this.value);
-    d3.select("#currentPrice") 
+    d3.select("#currentPrice")
       .text(reversePriceScale(this.value));
   });
-  
 
-  }; // end of requestData async data load 
+
+  }; // end of requestData async data load
 
   requestData();
 
@@ -251,8 +279,3 @@
 
 </body>
 </html>
-
-
-
-
-
