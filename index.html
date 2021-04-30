@@ -96,35 +96,80 @@
 
   };
 
-  var ratings = [2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
 
-  ratings.forEach( d => {
 
-    console.log(d);
+  function updateGraph(rating) {
+    // can later add more parameters for updating such as average price, or demographic factors that are available to be filtered on 
+    const data = restaurants
 
-    d3.select("#ratingFilter")
-      .append("span")
-      .text(d + " ")
-      .on("click", function() {
-        d3.selectAll("#graph circle").each( function() {
-          let restaurant = d3.select(this);
-          if (restaurant.attr("rating") >= d) {
-            restaurant.attr("opacity", 1.0);
-          }
-          else {
-            restaurant.attr("opacity", 0);
-          }
+    data = data.filter( (d) => {
+            return d.rating >= rating;
+    });
+    
+    map.selectAll('circle.dot').data(data)
+      .join( 
+        enter => { 
+          enter.append('circle')
+            .attr('class','dot')
+            .attr("r", 1)
+            .attr("fill", d => colorScale(d.cuisine))
+            .attr("cx", d => d.position[0])
+            .attr("cy", d => d.position[1])
+            .attr("opacity", 1);
+        },
+        update => update 
+          .attr("fill", d => colorScale(d.cuisine))
+          .attr("cx", d => d.position[0])
+          .attr("cy", d => d.position[1])
+          .attr("opacity", 1),
+        exit => { 
+          exit.remove()
         });
-      });
+      };
+     
+    var ratings = [2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
 
-  });
+    ratings.forEach( d => {
+    // For each rating, add a new button to the button bar
+      d3.select("div#ratingFilter")
+        .append("button")
+        .text( d )
+        .on("click", function() {
+        // When it's clicked, call updateBars to update the chart
+          updateGraph(d);
+        })
+    });
+
+  // var ratings = [2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
+
+  // ratings.forEach( d => {
+
+  //   d3.select("div#ratingFilter")
+  //     .append("button")
+  //     .text(d.toString())
+  //     .on("click", function() {
+  //       d3.selectAll("#graph circle").each( function() {
+  //         let restaurant = d3.select(this);
+  //         if (restaurant.attr("rating") >= d) {
+  //           restaurant.attr("opacity", 1.0);
+  //         }
+  //         else {
+  //           restaurant.attr("opacity", 0);
+  //         }
+  //       });
+  //     });
+
+  // });
 
   d3.select("#clear")
-  .on("click", function() {
-    d3.selectAll("#graph circle").each( function() {
-          let restaurant = d3.select(this);
-          restaurant.attr("opacity", 0)
-        });
+    .append("button")
+    .text("clear")
+    .on("click", function() {
+      updateGraph(0);
+
+
+  updateGraph(0);
+
   });
 
   requestData();
@@ -134,7 +179,7 @@
 
   Filter by Rating: 
   <div id="ratingFilter" class="filter"> </div>
-  <span id="clear">CLEAR</span>
+  <span id="clear"> </span>
 
 
 
