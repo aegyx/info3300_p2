@@ -27,3 +27,4 @@ processed.rename(columns={'Name':'name', 'JapaneseName':'japan_name', 'FirstCate
 processed.to_json("./kyoto_restaurants_processed.json", orient="records")
 
 
+
