@@ -3,7 +3,6 @@
   <title>P2</title>
   <script src="https://d3js.org/d3.v6.min.js"></script>
   <script src="https://d3js.org/topojson.v3.min.js"></script>
-  <script src="https://d3js.org/d3.geo.projection.v2.min.js"></script>
   <style>
 
   .county {
@@ -12,7 +11,7 @@
 
   .countyOutline {
     stroke: white;
-    stroke-width: 1px;
+    stroke-width: 0.5px;
     fill: none;
   }
 
@@ -40,29 +39,16 @@
 
 
   const requestData = async () => {
-    // // compare with dataset hw6
-    // const nyb = await d3.json("../ny_state_biodiversity.json");
-    // console.log(nyb);
-
-    // japan topojson
-    // const jp = await d3.json("../raw_data/japan.topojson");
-    // console.log(jp);
-    // var japan = topojson.feature(jp, jp.objects.japan);
-    // var japanMesh = topojson.mesh(jp, jp.objects.japan);
-    // var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], japan);
-    // var path = d3.geoPath().projection(projection);
-    //
-    // map.selectAll("path.county").data(japan.features)
-    //    .join("path")
-    //    .attr("class", "county")
-    //    .attr("d", path);
-    //
-    // map.append("path").datum(japanMesh)
-    //    .attr("class","countyOutline")
-    //    .attr("d", path);
 
     const kyoto = await d3.json("../kyoto_all.json");
     console.log(kyoto);
+
+    for (i = kyoto.objects.kyoto.geometries.length - 1; i >= 0; i -= 1) {
+      if (escape(kyoto.objects.kyoto.geometries[i].properties.GST_NAME) !== "%u4EAC%u90FD%u5E02") {
+        kyoto.objects.kyoto.geometries.splice(i, 1);
+      };
+    };
+    console.log(kyoto.objects.kyoto.geometries);
 
     var city = topojson.feature(kyoto, kyoto.objects.kyoto);
     var cityMesh = topojson.mesh(kyoto, kyoto.objects.kyoto);
@@ -83,19 +69,28 @@
     const restaurants = await d3.json("../kyoto_restaurants_processed.json");
     console.log(restaurants);
 
+    cuisine = [];
     restaurants.forEach( (d, i) => {
     // Use the projection just like a scale to convert from lng/lat to pixels
       d.position = projection([d.Long, d.Lat]);
+      cuisine.push(d.cuisine);
     });
-    console.log(restaurants)
-    
+    console.log(restaurants);
+    let uniqueCuisine = [...new Set(cuisine)];
+    console.log(uniqueCuisine);
+
+    // create the color scale
+    colorScale = d3.scaleOrdinal()
+                  .domain(uniqueCuisine)
+                  .range(d3.schemeTableau10);
+
     // Draw circles using the positions we just made
     map.selectAll("circle.dot").data(restaurants)
          .join("circle")
          .attr("class","dot")
          .attr("r", 1)
-         .attr("fill", "red")
-         .attr("opacity", 0.6)
+         .attr("fill", d => colorScale(d.cuisine))
+         .attr("opacity", 1)
          .attr("cx", d => d.position[0])
          .attr("cy", d => d.position[1]);
 
