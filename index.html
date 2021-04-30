@@ -1,0 +1,91 @@
+<html>
+<head>
+  <title>P2</title>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script src="https://d3js.org/topojson.v3.min.js"></script>
+  <script src="https://d3js.org/d3.geo.projection.v2.min.js"></script>
+  <style>
+
+  .county {
+    fill: lightgrey;
+  }
+
+  .countyOutline {
+    stroke: white;
+    stroke-width: 1px;
+    fill: none;
+  }
+
+
+  </style>
+</head>
+
+<body>
+  <!-- name and netid -->
+  <h3>Name: Kevin Lee, NetId: ksl66</h3>
+  <h3>Name: Yulu Cao, NetId: yc758</h3>
+
+  <svg id="graph" height="800" width="800" style="margin:20px"></svg>
+
+  <script>
+  // Initiation
+  const svg = d3.select("#graph");
+  const width = svg.attr("width");
+  const height = svg.attr("height");
+  const margin = { top: 20, right: 20, bottom: 20, left:20};
+  const mapWidth = width - margin.left - margin.right;
+  const mapHeight = height - margin.top - margin.bottom;
+  const map = svg.append("g")
+                  .attr("transform","translate("+margin.left+","+margin.top+")");
+
+
+  const requestData = async () => {
+    // load restaurant data
+    const restaurants = await d3.json("../kyoto_restaurants_processed.json");
+    console.log(restaurants);
+
+    // compare with dataset hw6
+    const nyb = await d3.json("../ny_state_biodiversity.json");
+    console.log(nyb);
+
+    // japan topojson
+    // const jp = await d3.json("../raw_data/japan.topojson");
+    // console.log(jp);
+    // var japan = topojson.feature(jp, jp.objects.japan);
+    // var japanMesh = topojson.mesh(jp, jp.objects.japan);
+    // var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], japan);
+    // var path = d3.geoPath().projection(projection);
+    //
+    // map.selectAll("path.county").data(japan.features)
+    //    .join("path")
+    //    .attr("class", "county")
+    //    .attr("d", path);
+    //
+    // map.append("path").datum(japanMesh)
+    //    .attr("class","countyOutline")
+    //    .attr("d", path);
+
+    const test = await d3.json("../test.topojson");
+    console.log(test);
+    var city = topojson.feature(test, test.objects.city);
+    var cityMesh = topojson.mesh(test, test.objects.city);
+    var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], city);
+    var path = d3.geoPath().projection(projection);
+
+    map.selectAll("path.county").data(city.features)
+       .join("path")
+       .attr("class", "county")
+       .attr("d", path);
+
+    map.append("path").datum(city)
+       .attr("class","countyOutline")
+       .attr("d", path);
+
+  };
+
+  requestData();
+
+  </script>
+
+</body>
+</html>
