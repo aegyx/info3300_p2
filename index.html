@@ -100,7 +100,7 @@
   <div class="left-column">
 
 
-  <h2><span class="kyoto"> Kyoto:</span> <br>Where are You Setting Up ?</h2>
+  <h2><span class="kyoto"> KYOTO:</span> <br>Where are You Setting Up ?</h2>
 
     <div id="filtergroup">
       <div class="filter">
@@ -285,7 +285,7 @@
       map.selectAll("circle.dot").data(data)
         .join("circle")
         .attr('class','dot')
-        .attr("r", 1)
+        .attr("r", 2.5)
         .attr("fill", d => cuisineScale(d.cuisine))
         .attr("cx", d => d.position[0])
         .attr("cy", d => d.position[1])
@@ -311,7 +311,7 @@
            .on("mouseout", function() {
              d3.select(this)
                .transition().duration(100)
-               .attr("r", 1);
+               .attr("r", 2.5);
 
              d3.select("#res_description").selectAll("text")
                .text("");
