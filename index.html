@@ -225,7 +225,7 @@
 
   d3.select("#priceSlider").on("input", function() {
     current_price = d3.select("#priceSlider").attr("value");
-    showCircles(this.value, current_rating);
+    showCircles(current_rating, this.value);
     d3.select("#currentPrice") 
       .text(reversePriceScale(this.value));
   });
