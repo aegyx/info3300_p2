@@ -15,7 +15,6 @@
     fill: none;
   }
 
-
   </style>
 </head>
 
@@ -24,25 +23,45 @@
   <h3>Name: Kevin Lee, NetId: ksl66</h3>
   <h3>Name: Yulu Cao, NetId: yc758</h3>
 
-  <svg id="graph" height="800" width="800" style="margin:20px"></svg>
+  <svg id="graph" height="1000" width="1000" style="margin:20px">
+  </svg>
 
   <script>
+
   // Initiation
   const svg = d3.select("#graph");
   const width = svg.attr("width");
   const height = svg.attr("height");
-  const margin = { top: 20, right: 20, bottom: 20, left:20};
+  const margin = { top: 20, right: 200, bottom: 20, left:20};
   const mapWidth = width - margin.left - margin.right;
   const mapHeight = height - margin.top - margin.bottom;
   const map = svg.append("g")
-                  .attr("transform","translate("+margin.left+","+margin.top+")");
-
-
+                 .attr("transform","translate("+margin.left+","+margin.top+")");
+  // TODO: need to change the transform function of the res_description
+  const res_description = svg.append("g")
+                             .attr("transform", "translate(800, 400)");
+  const res_name = res_description.append("text")
+                                  .attr("id", "res_name")
+                                  .attr("x", 0)
+                                  .attr("y", 0);
+  const res_jp_name = res_description.append("text")
+                                  .attr("id", "res_jp_name")
+                                  .attr("x", 0)
+                                  .attr("y", 20);
+  const res_price = res_description.append("text")
+                                  .attr("id", "res_price")
+                                  .attr("x", 0)
+                                  .attr("y", 40);
+  const res_rating = res_description.append("text")
+                                  .attr("id", "res_rating")
+                                  .attr("x", 0)
+                                  .attr("y", 60);
   const requestData = async () => {
 
     const kyoto = await d3.json("../kyoto_all.json");
     console.log(kyoto);
 
+    // filter the topojson to contain only 京都市
     for (i = kyoto.objects.kyoto.geometries.length - 1; i >= 0; i -= 1) {
       if (escape(kyoto.objects.kyoto.geometries[i].properties.GST_NAME) !== "%u4EAC%u90FD%u5E02") {
         kyoto.objects.kyoto.geometries.splice(i, 1);
@@ -50,6 +69,7 @@
     };
     console.log(kyoto.objects.kyoto.geometries);
 
+    // draw the map
     var city = topojson.feature(kyoto, kyoto.objects.kyoto);
     var cityMesh = topojson.mesh(kyoto, kyoto.objects.kyoto);
     var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], city);
@@ -63,7 +83,6 @@
     map.append("path").datum(city)
        .attr("class","countyOutline")
        .attr("d", path);
-
 
     // load restaurant data
     const restaurants = await d3.json("../kyoto_restaurants_processed.json");
@@ -92,8 +111,33 @@
          .attr("fill", d => colorScale(d.cuisine))
          .attr("opacity", 1)
          .attr("cx", d => d.position[0])
-         .attr("cy", d => d.position[1]);
+         .attr("cy", d => d.position[1])
+         .on("mouseover", function() {
+           d3.select(this)
+             .transition().duration(100)
+             .attr("r", 5);
 
+           let name = d3.select(this).datum()["name"];
+           let jp_name = d3.select(this).datum()["japan_name"];
+           let price = d3.select(this).datum()["price"];
+           let rating = d3.select(this).datum()["rating"];
+           d3.select("#res_name")
+             .text("NAME:" + name);
+           d3.select("#res_jp_name")
+             .text("JAPANESE NAME:" + jp_name);
+           d3.select("#res_price")
+             .text("AVG PRICE:" + price);
+           d3.select("#res_rating")
+             .text("RATING:" + rating);
+         })
+         .on("mouseout", function() {
+           d3.select(this)
+             .transition().duration(100)
+             .attr("r", 1);
+
+           d3.selectAll("text")
+             .text("");
+         });
   };
 
 
@@ -177,7 +221,7 @@
   </script>
 
 
-  Filter by Rating: 
+  Filter by Rating:
   <div id="ratingFilter" class="filter"> </div>
   <span id="clear"> </span>
 
