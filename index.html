@@ -63,6 +63,7 @@
 
     const kyoto = await d3.json("../kyoto_all.json");
     console.log(kyoto);
+
     var city = topojson.feature(kyoto, kyoto.objects.kyoto);
     var cityMesh = topojson.mesh(kyoto, kyoto.objects.kyoto);
     var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], city);
