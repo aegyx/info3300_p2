@@ -65,10 +65,14 @@
     //    .attr("class","countyOutline")
     //    .attr("d", path);
 
-    const test = await d3.json("../test.topojson");
+    const test0 = await d3.json("../test.topojson");
+    console.log(test0);
+
+
+    const test = await d3.json("../kyoto_all.json");
     console.log(test);
-    var city = topojson.feature(test, test.objects.city);
-    var cityMesh = topojson.mesh(test, test.objects.city);
+    var city = topojson.feature(test, test.objects.kyoto);
+    var cityMesh = topojson.mesh(test, test.objects.kyoto);
     var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], city);
     var path = d3.geoPath().projection(projection);
 
