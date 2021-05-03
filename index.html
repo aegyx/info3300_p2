@@ -34,7 +34,7 @@
   }*/
 
   .slider {
-    width: 450px;
+    width: 70%;
     display: block;
     margin-bottom: 2%;
   }
@@ -53,11 +53,11 @@
 
   #filtergroup {
     margin-top: 50px;
-    margin-left: 90px;
+    margin-left: 50px;
   }
 
   .slider_title {
-    font-size: 20px;
+    font-size: 15px;
     font-weight: lighter;
     display: block;
     margin-bottom: 3%;
@@ -66,8 +66,13 @@
 
   #cuisine_filter {
     margin-top: 10%;
+    margin-right: 3%;
     font-weight: lighter;
-    font-size: 20px;
+    font-size: 13px;
+  }
+
+  #currentRating, #currentPrice {
+    font-size: 13px;
   }
 
   .checkbox {
@@ -77,14 +82,13 @@
 
   h2 {
     font-weight: lighter;
-    font-size: 60px;
-    margin-left: 80px;
-    margin-top: 150px;
+    font-size: 30px;
+    margin-left: 40px;
   }
 
   .kyoto {
     color: red;
-    font-size: 85px;
+    font-size: 70px;
     margin-bottom: 0px;
   }
 
@@ -124,7 +128,7 @@
 
   <div class="right-column">
 
-  <svg id="graph" height="1000" width="1200" style="margin:20px"></svg>
+  <svg id="graph" height="700" width="900"></svg>
 
   <script>
 
@@ -132,7 +136,7 @@
   const svg = d3.select("#graph");
   const width = svg.attr("width");
   const height = svg.attr("height");
-  const margin = { top: 20, right: 300, bottom: 20, left:20};
+  const margin = { top: 0, right: 200, bottom: 20, left:20};
   const mapWidth = width - margin.left - margin.right;
   const mapHeight = height - margin.top - margin.bottom;
   const map = svg.append("g")
@@ -141,7 +145,7 @@
   // restaurant description label
   const res_description = svg.append("g")
                              .attr("id", "res_description")
-                             .attr("transform", "translate(800, 400)");
+                             .attr("transform", "translate(650, 200)");
   const res_name = res_description.append("text")
                                   .attr("id", "res_name")
                                   .attr("x", 0)
@@ -200,10 +204,10 @@
     var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], city);
     var path = d3.geoPath().projection(projection);
 
-    kyoto_areas = [];
-    kyoto.objects.kyoto.geometries.forEach( (d, i) => {
-      kyoto_areas.push(d.properties.CSS_NAME);
-    });
+    // kyoto_areas = [];
+    // kyoto.objects.kyoto.geometries.forEach( (d, i) => {
+    //   kyoto_areas.push(d.properties.CSS_NAME);
+    // });
 
     // Implement map region mouseover
     map.selectAll("path.county").data(city.features)
