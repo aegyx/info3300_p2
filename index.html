@@ -78,7 +78,7 @@
   h2 {
     font-weight: lighter;
     font-size: 30px;
-    margin-left: 27%;
+    margin-left: 25%;
     margin-top: 6%;
   }
 
@@ -136,7 +136,9 @@
   const mapWidth = width - margin.left - margin.right;
   const mapHeight = height - margin.top - margin.bottom;
   const map = svg.append("g")
-                 .attr("transform","translate("+margin.left+","+margin.top+")");
+    .attr("transform","translate("+margin.left+","+margin.top+")")
+    .attr("id", "map_layer");
+
   // TODO: need to change the transform function of the res_description
   // restaurant description label
   const res_description = svg.append("g")
@@ -177,30 +179,8 @@
 
   const requestData = async () => {
 
-    // const kyoto = await d3.json("../kyoto_all.json");
-    // console.log(kyoto);
-
     const kyoto = await d3.json("../test_kyoto.json");
     console.log(kyoto);
-
-    // // filter the topojson to contain only 京都市
-    // for (i = kyoto.objects.kyoto.geometries.length - 1; i >= 0; i -= 1) {
-    //   if (escape(kyoto.objects.kyoto.geometries[i].properties.GST_NAME) !== "%u4EAC%u90FD%u5E02") {
-    //     kyoto.objects.kyoto.geometries.splice(i, 1);
-    //   };
-    // };
-
-    // // further filter the topojson to contain only central Kyoto, based off X & Y-coordinate values
-    // var map_upper_boundary = 35.06777;
-    // var map_left_boundary = 135.66;
-
-    // for (i = kyoto.objects.kyoto.geometries.length - 1; i >= 0; i -= 1) {
-    //   if (kyoto.objects.kyoto.geometries[i].properties.Y_CODE > map_upper_boundary) {
-    //     kyoto.objects.kyoto.geometries.splice(i, 1);
-    //   } else if (kyoto.objects.kyoto.geometries[i].properties.X_CODE < map_left_boundary) {
-    //     kyoto.objects.kyoto.geometries.splice(i, 1);
-    // }};
-
 
     // filter the topojson to contain only kyoto's 11 wards: 北区、上京区、左京区、中京区、東山区、山科区、下京区、南区、右京区、西京区、伏見区
     var kyoto_wards = ['西京区', '山科区', '伏見区', '右京区', '南区', '下京区', '東山区', '中京区', '左京区', '上京区', '北区'];
@@ -252,46 +232,6 @@
          d3.select("#region_name")
            .text("");
        });
-
-
-
-    // // draw the map
-    // var city = topojson.feature(kyoto, kyoto.objects.kyoto);
-    // var cityMesh = topojson.mesh(kyoto, kyoto.objects.kyoto);
-    // var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], city);
-    // var path = d3.geoPath().projection(projection);
-
-    // // Implement map region mouseover
-    // map.selectAll("path.county").data(city.features)
-    //    .join("path")
-    //    .attr("class", "county")
-    //    .attr("d", path)
-    //    .on("mouseover", function() {
-    //      d3.select(this)
-    //        .transition().duration(100)
-    //        .style("fill", "grey");
-
-    //      let name = d3.select(this).datum().properties.MOJI;
-    //      d3.select("#region_name")
-    //        .text(name);
-    //      let other_name = d3.select(this).datum().properties.CSS_NAME;
-    //      d3.select("#other_name")
-    //        .text(other_name);
-    //    })
-    //    .on("mouseout", function() {
-    //      d3.select(this)
-    //        .transition().duration(100)
-    //        .style("fill", "lightgrey");
-
-    //      d3.select("#region_name")
-    //        .text("");
-    //    });
-
-    // map.append("path").datum(city)
-    //    .attr("class","countyOutline")
-    //    .attr("d", path);
-
-
 
     // Load restaurant data
     const restaurants = await d3.json("../kyoto_restaurants_processed.json");
@@ -443,74 +383,23 @@
       apply_current_filters();
     });
 
-    // old code
-
-    // var current_rating = d3.select("#rateSlider").property("value");
-    // var current_price = d3.select("#priceSlider").property("value");
-    // // var current_cuisine = uniqueCuisine; // why is this unique cuisine?
-    // var current_cuisine = [];
-    // d3.selectAll(".checkbox").each(function() {
-    //   current_box = d3.select(this);
-    //   if(current_box.property("checked")){
-    //     current_cuisine.push(current_box.property("value"));
-    //   };
-    // });
-    // showCircles(current_rating, current_price, current_cuisine);
-
-    // // Rating Slider
-    // // Upon loading page, show rating
-    // d3.select("#currentRating")
-    //     .text('Showing restaurants with rating at and above: ' + this.value);
-
-    // d3.select("#rateSlider").on("input", function() {
-    //   current_rating = d3.select("#rateSlider").property("value");
-    //   current_price = d3.select("#priceSlider").property("value");
-    //   current_cuisine = [];
-    //   d3.selectAll(".checkbox").each(function() {
-    //     current_box = d3.select(this);
-    //     if(current_box.property("checked")){
-    //       current_cuisine.push(current_box.property("value"));
-    //     };
-    //   });
-    //   showCircles(this.value, current_price, current_cuisine);
-    //   d3.select("#currentRating")
-    //     .text('Showing restaurants with rating at and above: ' + this.value);
-    // });
-
-    // // Price Slider
-    // // Upon loading page, show default price
-    // d3.select("#currentPrice")
-    //     .text('Showing restaurants with price at and above: ' + displayPriceScale(this.value));
-
-    // d3.select("#priceSlider").on("input", function() {
-    //   current_rating = d3.select("#rateSlider").property("value");
-    //   current_price = d3.select("#priceSlider").property("value");
-    //   current_cuisine = [];
-    //   d3.selectAll(".checkbox").each(function() {
-    //     current_box = d3.select(this);
-    //     if(current_box.property("checked")){
-    //       current_cuisine.push(current_box.property("value"));
-    //     };
-    //   });
-    //   showCircles(current_rating, this.value, current_cuisine);
-    //   d3.select("#currentPrice")
-    //     .text('Showing restaurants with price at and above: ' + displayPriceScale(this.value));
-    // });
-
-    // // Checkboxes
-    // d3.selectAll(".checkbox").on("change", function() {
-    //   current_rating = d3.select("#rateSlider").property("value");
-    //   current_price = d3.select("#priceSlider").property("value");
-    //   current_cuisine = [];
-    //   d3.selectAll(".checkbox").each(function() {
-    //     current_box = d3.select(this);
-    //     if(current_box.property("checked")){
-    //       current_cuisine.push(current_box.property("value"));
-    //     };
-    //   // showCircles(current_rating, current_price, current_cuisine);
-    //   });
-    //   showCircles(current_rating, current_price, current_cuisine);
-    // });
+    // // Scroll zoom
+    // var g = d3.select("#map_layer")
+    //   .on("wheel.zoom",function(){
+    //     var currScale = projection.scale();
+    //     var newScale = currScale - 2*event.deltaY;
+    //     var currTranslate = projection.translate();
+    //     var coords = projection.invert([event.offsetX, event.offsetY]);
+    //     projection.scale(newScale);
+    //     var newPos = projection(coords);
+    //     projection.translate([currTranslate[0] + (event.offsetX - newPos[0]), currTranslate[1] + (event.offsetY - newPos[1])]);
+    //     g.selectAll("path").attr("d", path);
+    //   })
+    //   .call(d3.drag().on("drag", function(){
+    //     var currTranslate = projection.translate();
+    //     projection.translate([currTranslate[0] + d3.event.dx, currTranslate[1] + d3.event.dy]);
+    //     g.selectAll("path").attr("d", path);
+    //   }));
 
 
   }; // end of requestData async data load
