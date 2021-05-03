@@ -242,7 +242,7 @@
     // Use the projection just like a scale to convert from lng/lat to pixels
       d.position = projection([d.Long, d.Lat]);
       cuisine.push(d.cuisine);
-      price.push(d.price);
+      price.push(d.price_int);
     });
     console.log(restaurants);
     let uniqueCuisine = [...new Set(cuisine)];
@@ -280,14 +280,16 @@
     // Create a price scale
     let price_ranges = [" ～￥999", "￥1000～￥1999", "￥2000～￥2999", "￥3000～￥3999", "￥4000～￥4999", "￥5000～￥5999", "￥6000～￥7999", "￥8000～￥9999", "￥10000～￥14999", "￥15000～￥19999", "￥20000～￥29999", "￥30000～"];
 
+    sorted_prices = uniquePrice.sort((a, b) => a - b);
+
     const priceScale = d3.scaleOrdinal()
-      .domain(price_ranges)
+      .domain(sorted_prices)
       .range([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 
     // Create a reverse price scale for calculating the input of the price slider
     const reversePriceScale = d3.scaleOrdinal()
       .domain([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
-      .range(price_ranges);
+      .range(sorted_prices);
 
     const displayPriceScale = d3.scaleOrdinal()
       .domain([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
@@ -297,10 +299,13 @@
     // Draw circles using the positions we just made
     function showCircles(rating, price, cuisine) {
 
+      console.log(price);
+      console.log(reversePriceScale(price));
+
       // filter restaurants based on the input rating and price
       var data = restaurants;
       data = data.filter( (d) => {
-        return d.rating >= rating && priceScale(d.price) >= price && cuisine.includes(d.cuisine);
+        return d.rating >= rating && d.price_int >= reversePriceScale(price) && cuisine.includes(d.cuisine);
       });
 
       map.selectAll("circle.dot").data(data)
