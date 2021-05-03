@@ -39,17 +39,17 @@
     display: flex;
   }
 
-  .x {
-    flex: 35%;
+  .left-column {
+    flex: 45%;
   }
 
   .right-column {
-    flex: 65%;
+    flex: 55%;
   }
 
   #filtergroup {
     margin-top: 8%;
-    margin-left: 8%;
+    margin-left: 27%;
   }
 
   .slider_title {
@@ -78,8 +78,8 @@
   h2 {
     font-weight: lighter;
     font-size: 30px;
-    margin-left: 40px;
-    margin-top: 12%;
+    margin-left: 27%;
+    margin-top: 6%;
   }
 
   .kyoto {
@@ -124,7 +124,7 @@
 
   <div class="right-column">
 
-  <svg id="graph" height="670" width="900"></svg>
+  <svg id="graph" height="670" width="700"></svg>
 
   <script>
 
@@ -141,7 +141,7 @@
   // restaurant description label
   const res_description = svg.append("g")
                              .attr("id", "res_description")
-                             .attr("transform", "translate(500, 200)");
+                             .attr("transform", "translate(380, 400)");
   const res_name = res_description.append("text")
                                   .attr("id", "res_name")
                                   .attr("x", 0)
@@ -240,7 +240,7 @@
        .on("mouseover", function() {
          d3.select(this)
            .transition().duration(100)
-           .style("fill", "grey");
+           .style("fill", "#adadad");
          let name = d3.select(this).datum().properties.CSS_NAME;
          d3.select("#region_name")
            .text(name);
