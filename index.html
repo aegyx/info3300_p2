@@ -130,6 +130,8 @@
 
   <svg id="graph" height="700" width="900"></svg>
 
+  <svg id="graphtest" height="700" width="900"></svg>
+
   <script>
 
   // Initiation
@@ -186,6 +188,9 @@
     const nyb = await d3.json("../ny_state_biodiversity.json");
     console.log(nyb);
 
+    const test = await d3.json("/test_kyoto.json");
+    console.log(test);
+
     // filter the topojson to contain only 京都市
     for (i = kyoto.objects.kyoto.geometries.length - 1; i >= 0; i -= 1) {
       if (escape(kyoto.objects.kyoto.geometries[i].properties.GST_NAME) !== "%u4EAC%u90FD%u5E02") {
@@ -210,10 +215,32 @@
     var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], city);
     var path = d3.geoPath().projection(projection);
 
-    // kyoto_areas = [];
-    // kyoto.objects.kyoto.geometries.forEach( (d, i) => {
-    //   kyoto_areas.push(d.properties.CSS_NAME);
-    // });
+
+
+
+
+
+
+    // test the new 
+    var citytest = topojson.feature(test, kyoto.objects.kyoto);
+    var projectiontest = d3.geoMercator().fitSize([mapWidth, mapHeight], citytest);
+    var pathtest = d3.geoPath().projection(projectiontest);
+
+    const maptest = svg.append("g")
+                 .attr("transform","translate("+margin.left+","+margin.top+")");
+
+    // Implement map region mouseover
+    maptest.selectAll("path.county").data(citytest.features)
+       .join("path")
+       .attr("class", "county")
+       .attr("d", pathtest)
+
+
+
+
+
+
+
 
     // Implement map region mouseover
     map.selectAll("path.county").data(city.features)
