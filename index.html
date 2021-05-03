@@ -232,10 +232,8 @@
        });
 
     // Load restaurant data
-    const restaurants = await d3.json("../kyoto_restaurants_processed.json");
+    var restaurants = await d3.json("../kyoto_restaurants_processed.json");
     console.log(restaurants);
-
-    console.log(city);
 
     cuisine = [];
     price = [];
@@ -256,6 +254,13 @@
     let uniqueCuisine = [...new Set(cuisine)];
     let uniquePrice = [...new Set(price)];
     let sorted_prices = uniquePrice.sort((a, b) => a - b);
+
+    // remove the restaurants that don't have wards 
+    console.log(restaurants.length)
+    restaurants = restaurants.filter( (d) => {
+      return d.ward != null;
+    });
+    console.log(restaurants.length)
 
     // create a cuisine scale
     colors = ['#000000', '#ffd700', '#ff0000', '#c71585', '#00fa9a', '#0000ff', '#1e90ff', '#ffdab9'];
