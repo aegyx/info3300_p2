@@ -1,5 +1,6 @@
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>P2</title>
   <script src="https://d3js.org/d3.v6.min.js"></script>
   <script src="https://d3js.org/topojson.v3.min.js"></script>
@@ -20,7 +21,6 @@
 
   .county {
     fill: lightgrey;
-    /*fill: #e8e8e8;*/
   }
 
   .countyOutline {
@@ -28,10 +28,6 @@
     stroke-width: 0.5px;
     fill: none;
   }
-/*
-  #currentRating {
-    font-weight: bold;
-  }*/
 
   .slider {
     width: 70%;
@@ -52,8 +48,8 @@
   }
 
   #filtergroup {
-    margin-top: 50px;
-    margin-left: 50px;
+    margin-top: 8%;
+    margin-left: 8%;
   }
 
   .slider_title {
@@ -84,6 +80,7 @@
     font-weight: lighter;
     font-size: 30px;
     margin-left: 40px;
+    margin-top: 12%;
   }
 
   .kyoto {
@@ -128,9 +125,7 @@
 
   <div class="right-column">
 
-  <svg id="graph" height="700" width="900"></svg>
-
-  <svg id="graphtest" height="700" width="900"></svg>
+  <svg id="graph" height="670" width="900"></svg>
 
   <script>
 
@@ -138,7 +133,7 @@
   const svg = d3.select("#graph");
   const width = svg.attr("width");
   const height = svg.attr("height");
-  const margin = { top: 0, right: 200, bottom: 20, left:20};
+  const margin = { top: 0, right: 300, bottom: 20, left:20};
   const mapWidth = width - margin.left - margin.right;
   const mapHeight = height - margin.top - margin.bottom;
   const map = svg.append("g")
@@ -147,7 +142,7 @@
   // restaurant description label
   const res_description = svg.append("g")
                              .attr("id", "res_description")
-                             .attr("transform", "translate(650, 200)");
+                             .attr("transform", "translate(500, 200)");
   const res_name = res_description.append("text")
                                   .attr("id", "res_name")
                                   .attr("x", 0)
@@ -183,66 +178,89 @@
 
   const requestData = async () => {
 
-    const kyoto = await d3.json("../kyoto_all.json");
+    // const kyoto = await d3.json("../kyoto_all.json");
+    // console.log(kyoto);
+
+    const kyoto = await d3.json("../test_kyoto.json");
     console.log(kyoto);
-    const nyb = await d3.json("../ny_state_biodiversity.json");
-    console.log(nyb);
 
-    const test = await d3.json("../test_kyoto.json");
-    console.log(test);
+    // // filter the topojson to contain only 京都市
+    // for (i = kyoto.objects.kyoto.geometries.length - 1; i >= 0; i -= 1) {
+    //   if (escape(kyoto.objects.kyoto.geometries[i].properties.GST_NAME) !== "%u4EAC%u90FD%u5E02") {
+    //     kyoto.objects.kyoto.geometries.splice(i, 1);
+    //   };
+    // };
 
-    // filter the topojson to contain only 京都市
+    // // further filter the topojson to contain only central Kyoto, based off X & Y-coordinate values
+    // var map_upper_boundary = 35.06777;
+    // var map_left_boundary = 135.66;
+
+    // for (i = kyoto.objects.kyoto.geometries.length - 1; i >= 0; i -= 1) {
+    //   if (kyoto.objects.kyoto.geometries[i].properties.Y_CODE > map_upper_boundary) {
+    //     kyoto.objects.kyoto.geometries.splice(i, 1);
+    //   } else if (kyoto.objects.kyoto.geometries[i].properties.X_CODE < map_left_boundary) {
+    //     kyoto.objects.kyoto.geometries.splice(i, 1);
+    // }};
+
+
+    // filter the topojson to contain only kyoto's 11 wards: 北区、上京区、左京区、中京区、東山区、山科区、下京区、南区、右京区、西京区、伏見区
+    var kyoto_wards = ['西京区', '山科区', '伏見区', '右京区', '南区', '下京区', '東山区', '中京区', '左京区', '上京区', '北区'];
+    kyoto_wards.forEach( (ward, i) => {
+      kyoto_wards[i] = escape(ward);
+    });
+
+    console.log(kyoto_wards);
+
     for (i = kyoto.objects.kyoto.geometries.length - 1; i >= 0; i -= 1) {
-      if (escape(kyoto.objects.kyoto.geometries[i].properties.GST_NAME) !== "%u4EAC%u90FD%u5E02") {
+      if (kyoto_wards.includes(escape(kyoto.objects.kyoto.geometries[i].properties.CSS_NAME))) {}
+      else {
         kyoto.objects.kyoto.geometries.splice(i, 1);
       };
     };
 
-    // further filter the topojson to contain only central Kyoto, based off X & Y-coordinate values
-    var map_upper_boundary = 35.06777;
-    var map_left_boundary = 135.66;
-
-    for (i = kyoto.objects.kyoto.geometries.length - 1; i >= 0; i -= 1) {
-      if (kyoto.objects.kyoto.geometries[i].properties.Y_CODE > map_upper_boundary) {
-        kyoto.objects.kyoto.geometries.splice(i, 1);
-      } else if (kyoto.objects.kyoto.geometries[i].properties.X_CODE < map_left_boundary) {
-        kyoto.objects.kyoto.geometries.splice(i, 1);
-    }};
-
-    // draw the map
+    // draw the map 
     var city = topojson.feature(kyoto, kyoto.objects.kyoto);
-    var cityMesh = topojson.mesh(kyoto, kyoto.objects.kyoto);
     var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], city);
     var path = d3.geoPath().projection(projection);
 
-
-
-
-
-
-
-    // test the new 
-    var citytest = topojson.feature(test, test.objects.kyoto);
-    var projectiontest = d3.geoMercator().fitSize([mapWidth, mapHeight], citytest);
-    var pathtest = d3.geoPath().projection(projectiontest);
-
-    const maptest = svg.append("g")
-                 .attr("transform","translate("+margin.left+","+margin.top+")");
-
     // Implement map region mouseover
-    maptest.selectAll("path.county").data(citytest.features)
+    map.selectAll("path.county").data(city.features)
        .join("path")
        .attr("class", "county")
-       .attr("d", pathtest);
+       .attr("d", path);
 
-    maptest.append("path").datum(citytest)
+    map.append("path").datum(city)
        .attr("class","countyOutline")
-       .attr("d", pathtest);
+       .attr("d", path);
+
+    // Implement map region mouseover
+    map.selectAll("path.county").data(city.features)
+       .join("path")
+       .attr("class", "county")
+       .attr("d", path)
+       .on("mouseover", function() {
+         d3.select(this)
+           .transition().duration(100)
+           .style("fill", "grey");
+         let name = d3.select(this).datum().properties.CSS_NAME;
+         d3.select("#region_name")
+           .text(name);
+       })
+       .on("mouseout", function() {
+         d3.select(this)
+           .transition().duration(100)
+           .style("fill", "lightgrey");
+         d3.select("#region_name")
+           .text("");
+       });
 
 
 
-
-
+    // // draw the map
+    // var city = topojson.feature(kyoto, kyoto.objects.kyoto);
+    // var cityMesh = topojson.mesh(kyoto, kyoto.objects.kyoto);
+    // var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], city);
+    // var path = d3.geoPath().projection(projection);
 
     // // Implement map region mouseover
     // map.selectAll("path.county").data(city.features)
@@ -274,6 +292,8 @@
     //    .attr("class","countyOutline")
     //    .attr("d", path);
 
+
+
     // Load restaurant data
     const restaurants = await d3.json("../kyoto_restaurants_processed.json");
     console.log(restaurants);
@@ -296,7 +316,6 @@
     colors = ['#000000', '#ffd700', '#ff0000', '#c71585', '#00fa9a', '#0000ff', '#1e90ff', '#ffdab9'];
     cuisineScale = d3.scaleOrdinal()
                   .domain(uniqueCuisine)
-                  // .range(d3.schemeTableau10);
                   .range(colors);
 
     // cuisine filter
@@ -320,10 +339,8 @@
     console.log(ratingextent); // the lowest rating is 3.0, and the highest is 4.2. Adjust slider to accomodate
 
     // Create a price scale
-    let price_ranges = [" ～￥999", "￥1000～￥1999", "￥2000～￥2999", "￥3000～￥3999", "￥4000～￥4999", "￥5000～￥5999", "￥6000～￥7999", "￥8000～￥9999", "￥10000～￥14999", "￥15000～￥19999", "￥20000～￥29999", "￥30000～"];
-
     sorted_prices = uniquePrice.sort((a, b) => a - b);
-
+    
     const priceScale = d3.scaleOrdinal()
       .domain(sorted_prices)
       .range([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
@@ -335,7 +352,7 @@
 
     const displayPriceScale = d3.scaleOrdinal()
       .domain([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
-      .range(["~999 JPY", "1000~1999 JPY", "2000~2999 JPY", "3000~3999 JPY", "4000~4999 JPY", "5000~5999 JPY", "6000~7999 JPY", "8000~9999 JPY", "10000~14999 JPY", "15000~19999 JPY", "20000~29999 JPY", "30000+ JPY"]);
+      .range(["~\uffe5999", "\uffe51000~\uffe51999", "\uffe52000~\uffe52999", "\uffe53000~\uffe53999", "\uffe54000~\uffe54999 ", "\uffe55000~\uffe55999", "\uffe56000~\uffe57999", "\uffe58000~\uffe59999", "\uffe510000~\uffe514999", "\uffe515000~\uffe519999", "\uffe520000~\uffe529999", "\uffe530000+"]);
 
 
     // Draw circles using the positions we just made
