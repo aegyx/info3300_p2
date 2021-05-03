@@ -53,15 +53,14 @@
   }
 
   .slider_title {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: lighter;
     display: block;
     margin-bottom: 3%;
-    margin-top: 10%;
+    margin-top: 8%;
   }
 
   #cuisine_filter {
-    margin-top: 10%;
     margin-right: 3%;
     font-weight: lighter;
     font-size: 13px;
@@ -319,6 +318,10 @@
                   .range(colors);
 
     // cuisine filter
+    d3.select("#cuisine_filter")
+      .append("span")
+      .attr("class", "slider_title")
+      .text("Filter on Cuisine")
     uniqueCuisine.sort();
     uniqueCuisine.forEach( function(d, i) {
       // append checkbox
@@ -340,7 +343,7 @@
 
     // Create a price scale
     sorted_prices = uniquePrice.sort((a, b) => a - b);
-    
+
     const priceScale = d3.scaleOrdinal()
       .domain(sorted_prices)
       .range([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
