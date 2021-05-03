@@ -338,112 +338,110 @@
            });
     }
 
-    // function apply_current_filters() {
-    //   let filter_rating = d3.select("#rateSlider").attr("value")
-    //   let filter_price = d3.select("#priceSlider").attr("value")
-    //   let filter_cuisine = [];
-    //   d3.selectAll(".checkbox").each(function() {
-    //     current_box = d3.select(this);
-    //     if(current_box.property("checked")){
-    //       filter_cuisine.push(current_box.property("value"));
-    //     };
-    //   });
-    //   return [filter_rating, filter_price, filter_cuisine];
-    // };
-
-    // apply_current_filters();
-
-    // d3.select("#currentRating")
-    //     .text('Showing restaurants with rating at and above: ' + this.value);
-    // d3.select("#currentPrice")
-    //     .text('Showing restaurants with price at and above: ' + displayPriceScale(this.value));
-
-    // d3.select("#rateSlider").on("input", function() {
-    //   let to_apply = apply_current_filters()
-    //   showCircles(to_apply[0], to_apply[1], to_apply[2])
-    //   d3.select("#currentRating")
-    //     .text('Showing restaurants with rating at and above: ' + this.value);
-    // });        
-
-    // d3.select("#priceSlider").on("input", function() {
-    //   let to_apply = apply_current_filters()
-    //   showCircles(to_apply[0], to_apply[1], to_apply[2])
-    //   d3.select("#currentPrice")
-    //     .text('Showing restaurants with price at and above: ' + displayPriceScale(this.value));
-    // });
-
-    // d3.selectAll(".checkbox").on("change", function() {
-    //   let to_apply = apply_current_filters()
-    //   showCircles(to_apply[0], to_apply[1], to_apply[2]);
-    // });
-
-
-    var current_rating = d3.select("#rateSlider").attr("value");
-    var current_price = d3.select("#priceSlider").attr("value");
-    // var current_cuisine = uniqueCuisine; // why is this unique cuisine?
-    var current_cuisine = [];
-    d3.selectAll(".checkbox").each(function() {
-      current_box = d3.select(this);
-      if(current_box.property("checked")){
-        current_cuisine.push(current_box.property("value"));
-      };
-    });
-    showCircles(current_rating, current_price, current_cuisine);
-
-    // Rating Slider
-    // Upon loading page, show rating
-    d3.select("#currentRating")
-        .text('Showing restaurants with rating at and above: ' + this.value);
-
-    d3.select("#rateSlider").on("input", function() {
-      current_rating = d3.select("#rateSlider").attr("value");
-      current_price = d3.select("#priceSlider").attr("value");
-      current_cuisine = [];
+    function apply_current_filters() {
+      let filter_rating = d3.select("#rateSlider").property("value")
+      let filter_price = d3.select("#priceSlider").property("value")
+      let filter_cuisine = [];
       d3.selectAll(".checkbox").each(function() {
         current_box = d3.select(this);
         if(current_box.property("checked")){
-          current_cuisine.push(current_box.property("value"));
+          filter_cuisine.push(current_box.property("value"));
         };
       });
-      showCircles(this.value, current_price, current_cuisine);
-      d3.select("#currentRating")
-        .text('Showing restaurants with rating at and above: ' + this.value);
-    });
+      showCircles(filter_rating, filter_price, filter_cuisine);
+    };
 
-    // Price Slider
-    // Upon loading page, show default price
+    apply_current_filters();
+
+    d3.select("#currentRating")
+        .text('Showing restaurants with rating at and above: ' + this.value);
     d3.select("#currentPrice")
         .text('Showing restaurants with price at and above: ' + displayPriceScale(this.value));
 
+    d3.select("#rateSlider").on("input", function() {
+      apply_current_filters();
+      d3.select("#currentRating")
+        .text('Showing restaurants with rating at and above: ' + this.value);
+    });        
+
     d3.select("#priceSlider").on("input", function() {
-      current_rating = d3.select("#rateSlider").attr("value");
-      current_price = d3.select("#priceSlider").attr("value");
-      current_cuisine = [];
-      d3.selectAll(".checkbox").each(function() {
-        current_box = d3.select(this);
-        if(current_box.property("checked")){
-          current_cuisine.push(current_box.property("value"));
-        };
-      });
-      showCircles(current_rating, this.value, current_cuisine);
+      apply_current_filters();
       d3.select("#currentPrice")
         .text('Showing restaurants with price at and above: ' + displayPriceScale(this.value));
     });
 
-    // Checkboxes
     d3.selectAll(".checkbox").on("change", function() {
-      current_rating = d3.select("#rateSlider").attr("value");
-      current_price = d3.select("#priceSlider").attr("value");
-      current_cuisine = [];
-      d3.selectAll(".checkbox").each(function() {
-        current_box = d3.select(this);
-        if(current_box.property("checked")){
-          current_cuisine.push(current_box.property("value"));
-        };
-      // showCircles(current_rating, current_price, current_cuisine);
-      });
-      showCircles(current_rating, current_price, current_cuisine);
+      apply_current_filters();
     });
+
+    // old code
+
+    // var current_rating = d3.select("#rateSlider").property("value");
+    // var current_price = d3.select("#priceSlider").property("value");
+    // // var current_cuisine = uniqueCuisine; // why is this unique cuisine?
+    // var current_cuisine = [];
+    // d3.selectAll(".checkbox").each(function() {
+    //   current_box = d3.select(this);
+    //   if(current_box.property("checked")){
+    //     current_cuisine.push(current_box.property("value"));
+    //   };
+    // });
+    // showCircles(current_rating, current_price, current_cuisine);
+
+    // // Rating Slider
+    // // Upon loading page, show rating
+    // d3.select("#currentRating")
+    //     .text('Showing restaurants with rating at and above: ' + this.value);
+
+    // d3.select("#rateSlider").on("input", function() {
+    //   current_rating = d3.select("#rateSlider").property("value");
+    //   current_price = d3.select("#priceSlider").property("value");
+    //   current_cuisine = [];
+    //   d3.selectAll(".checkbox").each(function() {
+    //     current_box = d3.select(this);
+    //     if(current_box.property("checked")){
+    //       current_cuisine.push(current_box.property("value"));
+    //     };
+    //   });
+    //   showCircles(this.value, current_price, current_cuisine);
+    //   d3.select("#currentRating")
+    //     .text('Showing restaurants with rating at and above: ' + this.value);
+    // });
+
+    // // Price Slider
+    // // Upon loading page, show default price
+    // d3.select("#currentPrice")
+    //     .text('Showing restaurants with price at and above: ' + displayPriceScale(this.value));
+
+    // d3.select("#priceSlider").on("input", function() {
+    //   current_rating = d3.select("#rateSlider").property("value");
+    //   current_price = d3.select("#priceSlider").property("value");
+    //   current_cuisine = [];
+    //   d3.selectAll(".checkbox").each(function() {
+    //     current_box = d3.select(this);
+    //     if(current_box.property("checked")){
+    //       current_cuisine.push(current_box.property("value"));
+    //     };
+    //   });
+    //   showCircles(current_rating, this.value, current_cuisine);
+    //   d3.select("#currentPrice")
+    //     .text('Showing restaurants with price at and above: ' + displayPriceScale(this.value));
+    // });
+
+    // // Checkboxes
+    // d3.selectAll(".checkbox").on("change", function() {
+    //   current_rating = d3.select("#rateSlider").property("value");
+    //   current_price = d3.select("#priceSlider").property("value");
+    //   current_cuisine = [];
+    //   d3.selectAll(".checkbox").each(function() {
+    //     current_box = d3.select(this);
+    //     if(current_box.property("checked")){
+    //       current_cuisine.push(current_box.property("value"));
+    //     };
+    //   // showCircles(current_rating, current_price, current_cuisine);
+    //   });
+    //   showCircles(current_rating, current_price, current_cuisine);
+    // });
 
 
   }; // end of requestData async data load
