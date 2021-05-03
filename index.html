@@ -188,7 +188,7 @@
     const nyb = await d3.json("../ny_state_biodiversity.json");
     console.log(nyb);
 
-    const test = await d3.json("/test_kyoto.json");
+    const test = await d3.json("../test_kyoto.json");
     console.log(test);
 
     // filter the topojson to contain only 京都市
@@ -222,7 +222,7 @@
 
 
     // test the new 
-    var citytest = topojson.feature(test, kyoto.objects.kyoto);
+    var citytest = topojson.feature(test, test.objects.kyoto);
     var projectiontest = d3.geoMercator().fitSize([mapWidth, mapHeight], citytest);
     var pathtest = d3.geoPath().projection(projectiontest);
 
@@ -233,44 +233,46 @@
     maptest.selectAll("path.county").data(citytest.features)
        .join("path")
        .attr("class", "county")
-       .attr("d", pathtest)
+       .attr("d", pathtest);
 
-
-
-
-
-
-
-
-    // Implement map region mouseover
-    map.selectAll("path.county").data(city.features)
-       .join("path")
-       .attr("class", "county")
-       .attr("d", path)
-       .on("mouseover", function() {
-         d3.select(this)
-           .transition().duration(100)
-           .style("fill", "grey");
-
-         let name = d3.select(this).datum().properties.MOJI;
-         d3.select("#region_name")
-           .text(name);
-         let other_name = d3.select(this).datum().properties.CSS_NAME;
-         d3.select("#other_name")
-           .text(other_name);
-       })
-       .on("mouseout", function() {
-         d3.select(this)
-           .transition().duration(100)
-           .style("fill", "lightgrey");
-
-         d3.select("#region_name")
-           .text("");
-       });
-
-    map.append("path").datum(city)
+    maptest.append("path").datum(citytest)
        .attr("class","countyOutline")
-       .attr("d", path);
+       .attr("d", pathtest);
+
+
+
+
+
+
+    // // Implement map region mouseover
+    // map.selectAll("path.county").data(city.features)
+    //    .join("path")
+    //    .attr("class", "county")
+    //    .attr("d", path)
+    //    .on("mouseover", function() {
+    //      d3.select(this)
+    //        .transition().duration(100)
+    //        .style("fill", "grey");
+
+    //      let name = d3.select(this).datum().properties.MOJI;
+    //      d3.select("#region_name")
+    //        .text(name);
+    //      let other_name = d3.select(this).datum().properties.CSS_NAME;
+    //      d3.select("#other_name")
+    //        .text(other_name);
+    //    })
+    //    .on("mouseout", function() {
+    //      d3.select(this)
+    //        .transition().duration(100)
+    //        .style("fill", "lightgrey");
+
+    //      d3.select("#region_name")
+    //        .text("");
+    //    });
+
+    // map.append("path").datum(city)
+    //    .attr("class","countyOutline")
+    //    .attr("d", path);
 
     // Load restaurant data
     const restaurants = await d3.json("../kyoto_restaurants_processed.json");
