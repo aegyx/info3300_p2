@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 
 raw = pd.read_csv("./raw_data/kyoto_restaurants.csv")
 
@@ -34,10 +35,24 @@ for cuisine in raw.FirstCategory.unique():
 proportion_cuisines = {k: v for k, v in sorted(proportion_cuisines.items(), reverse=True, key=lambda x: x[1])}
 
 
-column_list = ['Name','JapaneseName','FirstCategory','DinnerPrice','TotalRating','ReviewNum','Lat','Long']
+# process string prices into number averages
+price_list = raw.DinnerPrice.unique()
+print(price_list)
+
+def numberize(price_string):
+	match = re.findall(r'[0-9]+', price_string)
+	if len(match) > 1:
+		match = (int(match[0]) + int(match[1]) + 1)/2
+	else:
+		match = int(match[0])
+	return match
+
+raw['LunchPrice'] = raw['DinnerPrice'].apply(numberize)
+
+column_list = ['Name','JapaneseName','FirstCategory','DinnerPrice','LunchPrice','TotalRating','ReviewNum','Lat','Long']
 
 processed = raw[column_list]
-processed.rename(columns={'Name':'name', 'JapaneseName':'japan_name', 'FirstCategory':'cuisine', 'DinnerPrice':'price', 'TotalRating':'rating', 'ReviewNum':'num_reviews'}, inplace=True)
+processed.rename(columns={'Name':'name', 'JapaneseName':'japan_name', 'FirstCategory':'cuisine', 'DinnerPrice':'price', 'LunchPrice':'price_int', 'TotalRating':'rating', 'ReviewNum':'num_reviews'}, inplace=True)
 processed.to_json("./kyoto_restaurants_processed.json", orient="records")
 
 
