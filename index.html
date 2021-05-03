@@ -193,10 +193,16 @@
                                   .attr("id", "region_pop_res")
                                   .attr("x", 0)
                                   .attr("y", 40);
+  const region_avg_rating = region_description.append("text")
+                                  .attr("id", "region_avg_rating")
+                                  .attr("x", 0)
+                                  .attr("y", 60);
   // cuisine filter
   const cuisine_filter = d3.select("#filtergroup").append("div")
                            .attr("id", "cuisine_filter")
                            .attr("class", "filter");
+
+  var filter = [];
 
   const requestData = async () => {
 
@@ -296,6 +302,26 @@
 
          d3.select("#region_description")
            .attr("class", selected == true ? "" : "hidden");
+
+         let total_rating = 0;
+         let res_num = 0;
+         if (filter.length == 0) {
+           restaurants.forEach ( (d, i) => {
+             if (escape(d.ward) === escape(d3.select(this).datum().properties.CSS_NAME)) {
+               total_rating += d.rating;
+               res_num ++;
+             }
+           });
+         } else {
+           restaurants.forEach ( (d, i) => {
+             if (escape(d.ward) === escape(d3.select(this).datum().properties.CSS_NAME) && d.rating >= filter[0] && d.price_int >= reversePriceScale(filter[1]) && filter[2].includes(d.cuisine)) {
+               total_rating += d.rating;
+               res_num ++;
+             }
+           });
+         };
+         d3.select("#region_avg_rating")
+           .text((total_rating/res_num).toPrecision(3));
        });
 
      map.append("path").datum(city)
@@ -444,6 +470,9 @@
         current_box = d3.select(this);
         if(current_box.property("checked")){
           filter_cuisine.push(current_box.property("value"));
+          filter[0] = filter_rating;
+          filter[1] = filter_price;
+          filter[2] = filter_cuisine;
         };
       });
       showCircles(filter_rating, filter_price, filter_cuisine);
