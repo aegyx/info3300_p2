@@ -188,8 +188,6 @@
       kyoto_wards[i] = escape(ward);
     });
 
-    console.log(kyoto_wards);
-
     for (i = kyoto.objects.kyoto.geometries.length - 1; i >= 0; i -= 1) {
       if (kyoto_wards.includes(escape(kyoto.objects.kyoto.geometries[i].properties.CSS_NAME))) {}
       else {
@@ -237,6 +235,8 @@
     const restaurants = await d3.json("../kyoto_restaurants_processed.json");
     console.log(restaurants);
 
+    console.log(city);
+
     cuisine = [];
     price = [];
     restaurants.forEach( (d, i) => {
@@ -244,12 +244,18 @@
       d.position = projection([d.Long, d.Lat]);
       cuisine.push(d.cuisine);
       price.push(d.price_int);
+      // assign Kyoto ward values to each restaurant 
+      city.features.forEach( ward => {
+        if (d3.geoContains(ward, [d.Long, d.Lat])) {
+          // add a column to the restaurant dataset 
+          d.ward = ward.properties.CSS_NAME;
+        }
+      });
     });
     console.log(restaurants);
     let uniqueCuisine = [...new Set(cuisine)];
-    console.log(uniqueCuisine);
     let uniquePrice = [...new Set(price)];
-    console.log(uniquePrice);
+    let sorted_prices = uniquePrice.sort((a, b) => a - b);
 
     // create a cuisine scale
     colors = ['#000000', '#ffd700', '#ff0000', '#c71585', '#00fa9a', '#0000ff', '#1e90ff', '#ffdab9'];
@@ -282,8 +288,6 @@
     console.log(ratingextent); // the lowest rating is 3.0, and the highest is 4.2. Adjust slider to accomodate
 
     // Create a price scale
-    sorted_prices = uniquePrice.sort((a, b) => a - b);
-
     const priceScale = d3.scaleOrdinal()
       .domain(sorted_prices)
       .range([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
