@@ -232,8 +232,49 @@
        });
 
     // Load demographic data 
-    // var demographics = await d3.json("../demographics.json");
-    // console.log(demographics);
+    var demographics = await d3.csv("raw_data/demographics.csv");
+    console.log(demographics);
+
+    // match japanese ward names to english ward names 
+    demographics.forEach( (d, i) => {
+      if (d.AREA.includes("Kita-ku")) {
+        d.ward = "北区";
+      } else if (d.AREA.includes("Kamigyo-ku")) {
+        d.ward = "上京区";
+      } else if (d.AREA.includes("Sakyo-ku")) {
+        d.ward = "左京区";
+      } else if (d.AREA.includes("Nakagyo-ku")) {
+        d.ward = "中京区";
+      } else if (d.AREA.includes("Higashiyama-ku")) {
+        d.ward = "東山区";
+      } else if (d.AREA.includes("Shimogyo-ku")) {
+        d.ward = "下京区";
+      } else if (d.AREA.includes("Minami-ku")) {
+        d.ward = "南区";
+      } else if (d.AREA.includes("Ukyo-ku")) {
+        d.ward = "右京区";
+      } else if (d.AREA.includes("Fushimi-ku")) {
+        d.ward = "伏見区";
+      } else if (d.AREA.includes("Yamashina-ku")) {
+        d.ward = "山科区";
+      }　else if (d.AREA.includes("Nishikyo-ku")) {
+        d.ward = "西京区";
+      };
+    });
+
+    // assign population values to kyoto dataset
+    kyoto.objects.kyoto.geometries.forEach( (d, i) => {
+      demographics.forEach( ward => {
+        if (escape(ward.ward) === escape(d.properties.CSS_NAME)) {
+          d.pop = Number(ward.Total_population.replace(/,/g,"").replace(/\$/g,""));
+          d.foreigner = Number(ward.Foreigners.replace(/,/g,"").replace(/\$/g,""));
+        }
+      });
+    });
+
+    console.log(kyoto);
+
+
 
     // Load restaurant data
     var restaurants = await d3.json("../kyoto_restaurants_processed.json");
