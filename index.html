@@ -180,11 +180,27 @@
       };
     };
 
+    // further filter the topojson to contain only central Kyoto, based off X & Y-coordinate values
+    var map_upper_boundary = 35.06777;
+    var map_left_boundary = 135.66;
+
+    for (i = kyoto.objects.kyoto.geometries.length - 1; i >= 0; i -= 1) {
+      if (kyoto.objects.kyoto.geometries[i].properties.Y_CODE > map_upper_boundary) { 
+        kyoto.objects.kyoto.geometries.splice(i, 1);
+      } else if (kyoto.objects.kyoto.geometries[i].properties.X_CODE < map_left_boundary) {
+        kyoto.objects.kyoto.geometries.splice(i, 1);
+    }};
+
     // draw the map
     var city = topojson.feature(kyoto, kyoto.objects.kyoto);
     var cityMesh = topojson.mesh(kyoto, kyoto.objects.kyoto);
     var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], city);
     var path = d3.geoPath().projection(projection);
+
+    kyoto_areas = [];
+    kyoto.objects.kyoto.geometries.forEach( (d, i) => {
+      kyoto_areas.push(d.properties.CSS_NAME);
+    });
 
     map.selectAll("path.county").data(city.features)
        .join("path")
@@ -257,17 +273,17 @@
     // create a price scale; change later in Python to numbers and not strings
     let price_ranges = [" ～￥999", "￥1000～￥1999", "￥2000～￥2999", "￥3000～￥3999", "￥4000～￥4999", "￥5000～￥5999", "￥6000～￥7999", "￥8000～￥9999", "￥10000～￥14999", "￥15000～￥19999", "￥20000～￥29999", "￥30000～"];
 
-    priceScale = d3.scaleOrdinal()
+    const priceScale = d3.scaleOrdinal()
       .domain(price_ranges)
       .range([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 
     // create a reverse price scale for calculating the input of the price slider
-    reversePriceScale = d3.scaleOrdinal()
+    const reversePriceScale = d3.scaleOrdinal()
       .domain([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
       .range(price_ranges);
 
 
-    displayPriceScale = d3.scaleOrdinal()
+    const displayPriceScale = d3.scaleOrdinal()
       .domain([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
       .range(["~999 JPY", "1000~1999 JPY", "2000~2999 JPY", "3000~3999 JPY", "4000~4999 JPY", "5000~5999 JPY", "6000~7999 JPY", "8000~9999 JPY", "10000~14999 JPY", "15000~19999 JPY", "20000~29999 JPY", "30000+ JPY"]);
 
