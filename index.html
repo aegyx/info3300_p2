@@ -233,7 +233,7 @@
        .attr("d", path);
 
     // Load restaurant data
-    const restaurants = await d3.json("../kyoto_restaurants.json");
+    const restaurants = await d3.json("../kyoto_restaurants_processed.json");
     console.log(restaurants);
 
     cuisine = [];
@@ -318,16 +318,16 @@
 
              let name = d3.select(this).datum()["name"];
              let jp_name = d3.select(this).datum()["japan_name"];
-             let price = d3.select(this).datum()["price"];
-             let rating = d3.select(this).datum()["rating"];
+             let datum_price = d3.select(this).datum()["price"];
+             let datum_rating = d3.select(this).datum()["rating"];
              d3.select("#res_name")
                .text("NAME:" + name);
              d3.select("#res_jp_name")
                .text("JAPANESE NAME:" + jp_name);
              d3.select("#res_price")
-               .text("AVG PRICE:" + price);
+               .text("AVG PRICE:" + datum_price);
              d3.select("#res_rating")
-               .text("RATING:" + rating);
+               .text("RATING:" + datum_rating);
            })
            .on("mouseout", function() {
              d3.select(this)
@@ -354,23 +354,27 @@
 
     apply_current_filters();
 
+    // Set the initial value
     d3.select("#currentRating")
         .text('Showing restaurants with rating at and above: ' + this.value);
     d3.select("#currentPrice")
         .text('Showing restaurants with price at and above: ' + displayPriceScale(this.value));
 
+    // Rating slider
     d3.select("#rateSlider").on("input", function() {
       apply_current_filters();
       d3.select("#currentRating")
         .text('Showing restaurants with rating at and above: ' + this.value);
     });        
 
+    // Price slider
     d3.select("#priceSlider").on("input", function() {
       apply_current_filters();
       d3.select("#currentPrice")
         .text('Showing restaurants with price at and above: ' + displayPriceScale(this.value));
     });
 
+    // Cuisine filter
     d3.selectAll(".checkbox").on("change", function() {
       apply_current_filters();
     });
