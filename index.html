@@ -5,6 +5,27 @@
   <script src="https://d3js.org/d3.v6.min.js"></script>
   <script src="https://d3js.org/topojson.v3.min.js"></script>
   <style>
+  .label {
+    margin:4px;
+    background-color:#EFEFEF;
+    border-radius:4px;
+    border:1px solid #D0D0D0;
+    overflow:auto;
+    float:left;
+  }
+  .label label {
+    float:left;
+    width:4.0em;
+}
+  .label label span {
+    text-align:center;
+    padding:3px 0px;
+    display:block;
+}
+  /* .label label input {
+    position:absolute;
+    top:-20px;
+  } */
 
   .hidden {
     display: none;
@@ -408,16 +429,21 @@
     uniqueCuisine.forEach( function(d, i) {
       // append checkbox
       d3.select("#cuisine_filter")
+        .append("div")
+        .attr("class", "label")
+        .append("label")
+        .attr("id", "label" + i)
         .append("input")
         .attr("class", "checkbox")
         .attr("type", "checkbox")
         .attr("value", d)
         .property("checked", false);
-      // append label
       d3.select("#cuisine_filter")
-        .append("label")
+        .select("#" + "label" + i)
+        .append("span")
         .text(d)
         .style("color",cuisineScale(d));
+
     });
 
     const ratingextent = d3.extent(restaurants, d => d['rating']);
