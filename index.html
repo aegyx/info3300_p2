@@ -229,7 +229,7 @@
   const requestData = async () => {
 
     // kyoto topojson that only contains wards
-    const kyoto = await d3.json("../test_kyoto.json");
+    const kyoto = await d3.json("kyoto.json");
     console.log(kyoto);
 
     // filter the topojson to contain only kyoto's 11 wards: 北区、上京区、左京区、中京区、東山区、山科区、下京区、南区、右京区、西京区、伏見区
@@ -363,7 +363,7 @@
         .attr("d", path);
 
     // Load restaurant data
-    var restaurants = await d3.json("../kyoto_restaurants_processed.json");
+    var restaurants = await d3.json("kyoto_restaurants_processed.json");
     console.log(restaurants);
 
     cuisine = [];
