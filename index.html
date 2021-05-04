@@ -286,12 +286,15 @@
        .join("path")
        .attr("class", "county")
        .attr("d", path)
-       .on("click", function() {
-         currentFill = d3.select(this).style("fill");
-         selected = (currentFill == "rgb(211, 211, 211)" ? true : false);
+       .on("mouseover", function() {
+         // currentFill = d3.select(this).style("fill");
+         // selected = (currentFill == "rgb(211, 211, 211)" ? true : false);
+         // d3.select(this)
+         //   .transition().duration(100)
+         //   .style("fill", selected == true ? "rgb(173, 173, 173)" : "rgb(211, 211, 211)");
          d3.select(this)
            .transition().duration(100)
-           .style("fill", selected == true ? "rgb(173, 173, 173)" : "rgb(211, 211, 211)");
+           .style("fill", "rgb(173, 173, 173)");
 
          let name = d3.select(this).datum().properties.CSS_NAME;
          d3.select("#region_name")
@@ -303,9 +306,6 @@
          let res_count = d3.select(this).datum().properties.RES_COUNT;
          d3.select("#region_pop_res")
            .text((pop/res_count).toFixed(0) + " people / restaurant");
-
-         d3.select("#region_description")
-           .attr("class", selected == true ? "" : "hidden");
 
          let total_rating = 0;
          let total_price = 0;
@@ -332,6 +332,17 @@
            .text("AVG RATING: " + (total_rating/res_num).toPrecision(3));
          d3.select("#region_avg_price")
            .text("AVG PRICE: " + "\uffe5" + (total_price/res_num).toFixed(0));
+
+         d3.select("#region_description")
+           .attr("class", "");
+       })
+       .on("mouseout", function(){
+         d3.select(this)
+           .transition().duration(100)
+           .style("fill", "lightgrey");
+
+         d3.select("#region_description")
+           .attr("class", "hidden");
        });
 
      map.append("path").datum(city)
