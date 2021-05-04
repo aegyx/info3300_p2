@@ -298,11 +298,11 @@
            .text(name);
          let name_en = d3.select(this).datum().properties.WARD_EN;
          d3.select("#region_name_en")
-           .text(name_en);
+           .text("REGION NAME: " + name_en);
          let pop = d3.select(this).datum().properties.POP;
          let res_count = d3.select(this).datum().properties.RES_COUNT;
          d3.select("#region_pop_res")
-           .text((pop/res_count).toPrecision(6) + " people/restaurant");
+           .text((pop/res_count).toFixed(0) + " people / restaurant");
 
          d3.select("#region_description")
            .attr("class", selected == true ? "" : "hidden");
@@ -331,7 +331,7 @@
          d3.select("#region_avg_rating")
            .text("AVG RATING: " + (total_rating/res_num).toPrecision(3));
          d3.select("#region_avg_price")
-           .text("AVG PRICE: " + (total_price/res_num).toPrecision(6));
+           .text("AVG PRICE: " + "\uffe5" + (total_price/res_num).toFixed(0));
        });
 
      map.append("path").datum(city)
@@ -448,6 +448,7 @@
              d3.select(this)
                .transition().duration(100)
                .attr("r", 5);
+
 
              let name = d3.select(this).datum()["name"];
              let jp_name = d3.select(this).datum()["japan_name"];
