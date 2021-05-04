@@ -5,23 +5,29 @@
   <script src="https://d3js.org/d3.v6.min.js"></script>
   <script src="https://d3js.org/topojson.v3.min.js"></script>
   <style>
-  .label {
+  .label_div {
     margin:4px;
-    background-color:#EFEFEF;
-    border-radius:4px;
+    background-color:white;
+    border-radius:20px;
     border:1px solid #D0D0D0;
     overflow:auto;
     float:left;
   }
-  .label label {
+  .label_div label {
     float:left;
-    width:4.0em;
-}
-  .label label span {
+    width:12.0em;
+    height:3.0em;
+  }
+  .label_div label span {
     text-align:center;
-    padding:3px 0px;
+    padding:12px 0px;
     display:block;
-}
+  }
+  .checkbox {
+    margin-bottom: 6%;
+    margin-left: 1.5%;
+    display: none;
+  }
   /* .label label input {
     position:absolute;
     top:-20px;
@@ -96,11 +102,6 @@
     font-weight: lighter;
   }
 
-  .checkbox {
-    margin-bottom: 6%;
-    margin-left: 1.5%;
-  }
-
   h2 {
     font-weight: lighter;
     font-size: 30px;
@@ -128,6 +129,10 @@
 </head>
 
 <body>
+  <!-- name and netid -->
+<!--   <h3>Name: Kevin Lee, NetId: ksl66</h3>
+  <h3>Name: Yulu Cao, NetId: yc758</h3> -->
+
 <h3>Kevin Lee [ksl66] | Yulu Cao [yc758]</h3>
 
 <div class="page-wrapper">
@@ -173,6 +178,8 @@
     .attr("transform","translate("+margin.left+","+margin.top+")")
     .attr("id", "map_layer");
 
+  // TODO: need to change the transform function of the res_description
+  // restaurant description label
   const res_description = svg.append("g")
                              .attr("id", "res_description")
                              .attr("transform", "translate(380, 400)");
@@ -409,9 +416,7 @@
     console.log(restaurants.length)
 
     // create a cuisine scale
-    colors2 = ['#000000', '#ffd700', '#ff0000', '#c71585', '#00ff00', '#0000ff', '#1e90ff', '#7fffd4'];
-
-    colors = ['#000000', '#ffd700', '#ff0000', '#c71585', '#00fa9a', '#0000ff', '#1e90ff', '#ffdab9'];
+    colors = ['rgb(0, 0, 0)', 'rgb(255, 215, 0)', 'rgb(255, 0, 0)', 'rgb(199, 21, 133)', 'rgb(0, 250, 154)', 'rgb(0, 0, 255)', 'rgb(31, 144, 255)', 'rgb(255, 218, 185)'];
     cuisineScale = d3.scaleOrdinal()
                   .domain(uniqueCuisine)
                   .range(colors);
@@ -426,7 +431,7 @@
       // append checkbox
       d3.select("#cuisine_filter")
         .append("div")
-        .attr("class", "label")
+        .attr("class", "label_div")
         .append("label")
         .attr("id", "label" + i)
         .append("input")
@@ -438,13 +443,26 @@
         .select("#" + "label" + i)
         .append("span")
         .text(d)
-        .style("color",cuisineScale(d));
+        .style("color", "black")
+        .on("click", function(){
+          currentFill = d3.select(this).style("color");
+          selected = (currentFill == cuisineScale(d) ? true : false);
+          d3.select("#cuisine_filter")
+            .select("#" + "label" + i)
+            .select("span")
+            .text(d)
+            .style("color", selected == false ? cuisineScale(d) : "black");
+        });
 
     });
 
     const ratingextent = d3.extent(restaurants, d => d['rating']);
-    console.log(ratingextent); 
-    // the lowest rating is 3.0, and the highest is 4.2. Adjust slider to accomodate
+    console.log(ratingextent); // the lowest rating is 3.0, and the highest is 4.2. Adjust slider to accomodate
+
+    // Create a price scale
+    const priceScale = d3.scaleOrdinal()
+      .domain(sorted_prices)
+      .range([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 
     // Create a reverse price scale for calculating the input of the price slider
     const reversePriceScale = d3.scaleOrdinal()
