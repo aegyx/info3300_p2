@@ -5,6 +5,7 @@
   <script src="https://d3js.org/d3.v6.min.js"></script>
   <script src="https://d3js.org/topojson.v3.min.js"></script>
   <style>
+
   .label_div {
     margin:4px;
     background-color:white;
@@ -80,7 +81,7 @@
 
   #filtergroup {
     margin-top: 0%;
-    margin-left: 27%;
+    margin-left: 29%;
   }
 
   .slider_title {
@@ -94,7 +95,7 @@
   #cuisine_filter {
     margin-right: 3%;
     font-weight: lighter;
-    font-size: 13px;
+    font-size: 12px;
   }
 
   #currentRating, #currentPrice {
@@ -105,8 +106,8 @@
   h2 {
     font-weight: lighter;
     font-size: 30px;
-    margin-left: 25%;
-    margin-top: 5%;
+    margin-left: 27%;
+    margin-top: 0%;
   }
 
   .kyoto {
@@ -116,7 +117,7 @@
   }
 
   #intro {
-    margin-left: 25%;
+    margin-left: 27%;
     margin-top: -1%;
     font-weight: lighter;
     font-style: italic;
@@ -129,9 +130,6 @@
 </head>
 
 <body>
-  <!-- name and netid -->
-<!--   <h3>Name: Kevin Lee, NetId: ksl66</h3>
-  <h3>Name: Yulu Cao, NetId: yc758</h3> -->
 
 <h3>Kevin Lee [ksl66] | Yulu Cao [yc758]</h3>
 
@@ -178,8 +176,6 @@
     .attr("transform","translate("+margin.left+","+margin.top+")")
     .attr("id", "map_layer");
 
-  // TODO: need to change the transform function of the res_description
-  // restaurant description label
   const res_description = svg.append("g")
                              .attr("id", "res_description")
                              .attr("transform", "translate(380, 400)");
@@ -309,11 +305,6 @@
        .attr("class", "county")
        .attr("d", path)
        .on("mouseover", function() {
-         // currentFill = d3.select(this).style("fill");
-         // selected = (currentFill == "rgb(211, 211, 211)" ? true : false);
-         // d3.select(this)
-         //   .transition().duration(100)
-         //   .style("fill", selected == true ? "rgb(173, 173, 173)" : "rgb(211, 211, 211)");
          d3.select(this)
            .transition().duration(100)
            .style("fill", "rgb(173, 173, 173)");
@@ -377,19 +368,6 @@
 
     cuisine = [];
     price = [];
-    // restaurants.forEach( (d, i) => {
-    // // Use the projection just like a scale to convert from lng/lat to pixels
-    //   d.position = projection([d.Long, d.Lat]);
-    //   cuisine.push(d.cuisine);
-    //   price.push(d.price_int);
-    //   // assign Kyoto ward values to each restaurant
-    //   city.features.forEach( ward => {
-    //     if (d3.geoContains(ward, [d.Long, d.Lat])) {
-    //       // add a column to the restaurant dataset
-    //       d.ward = ward.properties.CSS_NAME;
-    //     }
-    //   });
-    // });
     city.features.forEach( ward => {
       ward.properties.RES_COUNT = 0;
       restaurants.forEach( (d, i) => {
@@ -457,7 +435,8 @@
     });
 
     const ratingextent = d3.extent(restaurants, d => d['rating']);
-    console.log(ratingextent); // the lowest rating is 3.0, and the highest is 4.2. Adjust slider to accomodate
+    console.log(ratingextent); 
+    // the lowest rating is 3.0, and the highest is 4.2. Adjust slider to accomodate
 
     // Create a price scale
     const priceScale = d3.scaleOrdinal()
@@ -562,25 +541,6 @@
     d3.selectAll(".checkbox").on("change", function() {
       apply_current_filters();
     });
-
-    // // Scroll zoom
-    // var g = d3.select("#map_layer")
-    //   .on("wheel.zoom",function(){
-    //     var currScale = projection.scale();
-    //     var newScale = currScale - 2*event.deltaY;
-    //     var currTranslate = projection.translate();
-    //     var coords = projection.invert([event.offsetX, event.offsetY]);
-    //     projection.scale(newScale);
-    //     var newPos = projection(coords);
-    //     projection.translate([currTranslate[0] + (event.offsetX - newPos[0]), currTranslate[1] + (event.offsetY - newPos[1])]);
-    //     g.selectAll("path").attr("d", path);
-    //   })
-    //   .call(d3.drag().on("drag", function(){
-    //     var currTranslate = projection.translate();
-    //     projection.translate([currTranslate[0] + d3.event.dx, currTranslate[1] + d3.event.dy]);
-    //     g.selectAll("path").attr("d", path);
-    //   }));
-
 
   }; // end of requestData async data load
 
