@@ -504,9 +504,9 @@
 
     // Set the initial value
     d3.select("#currentRating")
-        .text('Showing restaurants with rating at and above: ' + this.value);
+        .text('Showing restaurants with rating at and above: ' + d3.select("#rateSlider").property("value"));
     d3.select("#currentPrice")
-        .text('Showing restaurants with price at and above: ' + displayPriceScale(this.value));
+        .text('Showing restaurants with price at and above: ' + displayPriceScale(d3.select("#priceSlider").property("value")));
 
     // Rating slider
     d3.select("#rateSlider").on("input", function() {
