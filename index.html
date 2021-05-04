@@ -128,10 +128,6 @@
 </head>
 
 <body>
-  <!-- name and netid -->
-<!--   <h3>Name: Kevin Lee, NetId: ksl66</h3>
-  <h3>Name: Yulu Cao, NetId: yc758</h3> -->
-
 <h3>Kevin Lee [ksl66] | Yulu Cao [yc758]</h3>
 
 <div class="page-wrapper">
@@ -177,8 +173,6 @@
     .attr("transform","translate("+margin.left+","+margin.top+")")
     .attr("id", "map_layer");
 
-  // TODO: need to change the transform function of the res_description
-  // restaurant description label
   const res_description = svg.append("g")
                              .attr("id", "res_description")
                              .attr("transform", "translate(380, 400)");
@@ -415,6 +409,8 @@
     console.log(restaurants.length)
 
     // create a cuisine scale
+    colors2 = ['#000000', '#ffd700', '#ff0000', '#c71585', '#00ff00', '#0000ff', '#1e90ff', '#7fffd4'];
+
     colors = ['#000000', '#ffd700', '#ff0000', '#c71585', '#00fa9a', '#0000ff', '#1e90ff', '#ffdab9'];
     cuisineScale = d3.scaleOrdinal()
                   .domain(uniqueCuisine)
@@ -447,12 +443,8 @@
     });
 
     const ratingextent = d3.extent(restaurants, d => d['rating']);
-    console.log(ratingextent); // the lowest rating is 3.0, and the highest is 4.2. Adjust slider to accomodate
-
-    // Create a price scale
-    const priceScale = d3.scaleOrdinal()
-      .domain(sorted_prices)
-      .range([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    console.log(ratingextent); 
+    // the lowest rating is 3.0, and the highest is 4.2. Adjust slider to accomodate
 
     // Create a reverse price scale for calculating the input of the price slider
     const reversePriceScale = d3.scaleOrdinal()
